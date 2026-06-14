@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "945548511735",
+    "project_id": "trustcircle-c9a8e",
+    "storage_bucket": "trustcircle-c9a8e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:945548511735:android:dddc2fa2e3ae10f6e646f2",
+        "android_client_info": {
+          "package_name": "com.zombieheart.trustcircle"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "945548511735-g7i8qftu0j7npg680uhloajenvhkvcv2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAyLJMeUsx8Fsn5W4fWTl3TCFG7p878S58"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "945548511735-g7i8qftu0j7npg680uhloajenvhkvcv2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

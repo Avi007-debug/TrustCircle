@@ -79,9 +79,31 @@ class NotificationService {
       scheduledDate,
       platformChannelSpecifics,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
       matchDateTimeComponents: DateTimeComponents.time,
+    );
+  }
+
+  Future<void> showWhatsAppStyleNotification(String title, String body) async {
+    await init();
+    
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+      'trust_circle_messages',
+      'Circle Updates',
+      channelDescription: 'Real-time updates from your circle',
+      importance: Importance.max,
+      priority: Priority.high,
+      ticker: 'ticker',
+      styleInformation: DefaultStyleInformation(true, true),
+    );
+    const NotificationDetails platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics);
+
+    await flutterLocalNotificationsPlugin.show(
+      DateTime.now().millisecond,
+      title,
+      body,
+      platformChannelSpecifics,
     );
   }
 

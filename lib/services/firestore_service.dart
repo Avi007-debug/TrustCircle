@@ -96,6 +96,25 @@ class FirestoreService {
     return users;
   }
 
+  Future<dynamic> getUser(String uid) async {
+    final snap = await _db.collection(AppConstants.usersCollection).doc(uid).get();
+    if (!snap.exists) return null;
+    return snap.data(); // Needs to be parsed into user model if exists, assuming returning map or simple object
+  }
+
+  Future<DateTime?> getLastActivityDate(String uid) async {
+    final snap = await _db
+        .collection(AppConstants.pulsesCollection)
+        .where('userId', isEqualTo: uid)
+        .orderBy('timestamp', descending: true)
+        .limit(1)
+        .get();
+    if (snap.docs.isNotEmpty) {
+      return (snap.docs.first.data()['timestamp'] as Timestamp).toDate();
+    }
+    return null;
+  }
+
   // ════════════════════════════════════════════════════════════════════════════
   // PULSES
   // ════════════════════════════════════════════════════════════════════════════

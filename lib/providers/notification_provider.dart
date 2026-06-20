@@ -3,13 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/notification_service.dart';
 
-final notificationsEnabledProvider = StateNotifierProvider<NotificationNotifier, bool>((ref) {
-  return NotificationNotifier();
-});
-
-class NotificationNotifier extends StateNotifier<bool> {
-  NotificationNotifier() : super(false) {
+class NotificationNotifier extends Notifier<bool> {
+  @override
+  bool build() {
     _loadState();
+    return false;
   }
 
   Future<void> _loadState() async {
@@ -29,3 +27,7 @@ class NotificationNotifier extends StateNotifier<bool> {
     }
   }
 }
+
+final notificationsEnabledProvider = NotifierProvider<NotificationNotifier, bool>(() {
+  return NotificationNotifier();
+});

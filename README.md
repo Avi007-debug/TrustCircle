@@ -47,13 +47,9 @@
 
 **GitHub Organization:** [Avi007-debug](https://github.com/Avi007-debug)
 
-### Team Members & Responsibilities
-
-| Role | Name | Responsibilities |
-|------|------|------------------|
-| **Frontend Lead** | Avishkar | Flutter Architecture, Riverpod, GoRouter, UI/UX, Dashboard, Check-in & Gratitude Screens |
-| **Backend Developer** | TBD | Firebase, Firestore, Authentication, Security Rules, Cloud Functions, Notifications |
-| **AI Developer** | TBD | Gemini Integration, Melange, Agora Setup, Silence Detection, AI Insights Engine |
+### Contributor
+**Name:** Avishkar More
+**Role:** Sole Developer (Frontend, Backend, AI Integration, UI/UX Architecture)
 
 ---
 
@@ -331,13 +327,11 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-## 👨‍💻 Authors
+## 👨‍💻 Contributor
 
-**Zombie Heart Team**
+**Zombie Heart**
 
-- Lead: Avishkar (Frontend)
-- To be added: Backend Developer
-- To be added: AI Developer
+- Avishkar More (Sole Developer)
 
 ---
 

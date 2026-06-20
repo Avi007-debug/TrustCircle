@@ -11,6 +11,8 @@ import '../../providers/auth_provider.dart';
 import '../../providers/circle_provider.dart';
 import '../../providers/pulse_provider.dart';
 import '../../providers/gratitude_provider.dart';
+import '../../services/silence_detector_service.dart';
+import '../../services/gemini_service.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -212,6 +214,71 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               style: TextStyle(color: subColor, fontSize: 14),
             ),
             const SizedBox(height: 24),
+
+            // ── Silence Detector Bubble ────────────────────────────────────
+            if (activeCircle != null)
+              FutureBuilder<List<Map<String, dynamic>>>(
+                future: ref.read(silenceDetectorProvider).getSilentMembers(activeCircle.members),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                    final silentMembers = snapshot.data!;
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 24),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: AppColors.watch.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: AppColors.watch.withOpacity(0.5)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.notifications_active_rounded, color: AppColors.watch),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'Someone may need support: ${silentMembers.map((m) => m['name']).join(', ')}',
+                              style: const TextStyle(color: AppColors.watch, fontWeight: FontWeight.w600, fontSize: 13),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
+
+            // ── Resolve Mode Banner ────────────────────────────────────────
+            if (trustScore < AppConstants.watchThreshold && activeCircle != null)
+              GestureDetector(
+                onTap: () => context.push('/resolve'),
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 24),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppColors.risk.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: AppColors.risk.withOpacity(0.5)),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.warning_amber_rounded, color: AppColors.risk, size: 32),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: const [
+                            Text('Resolve Mode Available', style: TextStyle(color: AppColors.risk, fontWeight: FontWeight.bold, fontSize: 16)),
+                            SizedBox(height: 4),
+                            Text('Trust score has dropped. Tap to get AI guidance.', style: TextStyle(color: AppColors.risk, fontSize: 13)),
+                          ],
+                        ),
+                      ),
+                      const Icon(Icons.arrow_forward_ios_rounded, color: AppColors.risk, size: 16),
+                    ],
+                  ),
+                ),
+              ),
 
             // ── Trust Ring + Stats Row ─────────────────────────────────────
             Container(

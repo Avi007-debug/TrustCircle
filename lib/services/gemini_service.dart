@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import '../core/constants/app_constants.dart';
 import '../data/models/pulse_model.dart';
@@ -111,4 +113,66 @@ Respond ONLY with valid JSON matching exactly this structure (no extra text, no 
       );
     }
   }
+
+  // ════════════════════════════════════════════════════════════════════════════
+  // NEW FEATURES: Voice Check-In and Resolve Guide
+  // ════════════════════════════════════════════════════════════════════════════
+
+  Future<Map<String, double>> analyzeVoiceJournal(String transcript) async {
+    final prompt = '''
+    Analyze this journal entry for emotional indicators and suggest trust scores for: heard, respected, safe, connected. 
+    The scores must be from 1 to 10.
+    Journal entry: "$transcript"
+    
+    Respond ONLY with valid JSON matching exactly this structure:
+    {
+      "heard": 0.0,
+      "respected": 0.0,
+      "safe": 0.0,
+      "connected": 0.0
+    }
+    ''';
+    
+    try {
+      final response = await _getModel.generateContent([Content.text(prompt)]);
+      final text = response.text ?? '';
+      final jsonStart = text.indexOf('{');
+      final jsonEnd = text.lastIndexOf('}');
+      if (jsonStart == -1 || jsonEnd == -1) throw Exception('Invalid JSON');
+      
+      final data = jsonDecode(text.substring(jsonStart, jsonEnd + 1)) as Map<String, dynamic>;
+      return {
+        'heard': (data['heard'] as num).toDouble(),
+        'respected': (data['respected'] as num).toDouble(),
+        'safe': (data['safe'] as num).toDouble(),
+        'connected': (data['connected'] as num).toDouble(),
+      };
+    } catch (e) {
+      debugPrint('Error analyzing voice: $e');
+      return {'heard': 5.0, 'respected': 5.0, 'safe': 5.0, 'connected': 5.0};
+    }
+  }
+
+  Future<String> generateResolveGuide(String circleId, double trustScore, List<dynamic> pulseData) async {
+    final prompt = '''
+    The trust score in this circle has dropped to \$trustScore%. 
+    Based on recent pulse data, generate a conflict resolution guide.
+    Include 3 sections:
+    1. Conflict Resolution Steps (numbered action items)
+    2. Conversation Suggestions (specific phrases)
+    3. Guided Questions (to ask each other)
+    ''';
+    
+    try {
+      final response = await _getModel.generateContent([Content.text(prompt)]);
+      return response.text ?? 'Could not generate guide.';
+    } catch (e) {
+      debugPrint('Error generating resolve guide: \$e');
+      return 'Failed to generate guide.';
+    }
+  }
 }
+
+final geminiServiceProvider = Provider<GeminiService>((ref) {
+  return GeminiService();
+});

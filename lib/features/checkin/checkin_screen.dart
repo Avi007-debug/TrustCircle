@@ -6,6 +6,8 @@ import '../../core/constants/app_constants.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/circle_provider.dart';
 import '../../providers/pulse_provider.dart';
+import '../../services/voice_service.dart';
+import '../../services/gemini_service.dart';
 
 class CheckinScreen extends ConsumerStatefulWidget {
   const CheckinScreen({super.key});
@@ -26,6 +28,9 @@ class _CheckinScreenState extends ConsumerState<CheckinScreen>
   late AnimationController _successController;
   late Animation<double> _successAnimation;
   bool _showSuccess = false;
+  
+  bool _isListening = false;
+  String _voiceTranscript = '';
 
   @override
   void initState() {
@@ -95,6 +100,39 @@ class _CheckinScreenState extends ConsumerState<CheckinScreen>
       }
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
+    }
+  }
+
+  void _toggleVoiceCheckin() async {
+    if (_isListening) {
+      await voiceService.stopListening();
+      setState(() => _isListening = false);
+      
+      if (_voiceTranscript.isNotEmpty) {
+        setState(() => _isSubmitting = true);
+        try {
+          final result = await ref.read(geminiServiceProvider).analyzeVoiceJournal(_voiceTranscript);
+          setState(() {
+            _values['heard'] = result['heard'] ?? 5.0;
+            _values['respected'] = result['respected'] ?? 5.0;
+            _values['safe'] = result['safe'] ?? 5.0;
+            _values['connected'] = result['connected'] ?? 5.0;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Scores updated from voice analysis!')));
+        } catch (e) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Analysis failed: $e')));
+        } finally {
+          setState(() => _isSubmitting = false);
+        }
+      }
+    } else {
+      setState(() {
+        _isListening = true;
+        _voiceTranscript = '';
+      });
+      await voiceService.startListening((text) {
+        setState(() => _voiceTranscript = text);
+      });
     }
   }
 
@@ -278,10 +316,27 @@ class _CheckinScreenState extends ConsumerState<CheckinScreen>
                         ),
                       ),
                       const SizedBox(width: 16),
-                      _MiniTrustRing(score: _trustScore, primary: primary),
+                      IconButton(
+                        onPressed: _toggleVoiceCheckin,
+                        icon: Icon(_isListening ? Icons.mic_rounded : Icons.mic_none_rounded),
+                        color: _isListening ? AppColors.risk : primary,
+                        iconSize: 32,
+                        tooltip: 'Voice Check-In',
+                      ),
                     ],
                   ),
                 ),
+                if (_isListening || _voiceTranscript.isNotEmpty) ...[
+                   const SizedBox(height: 12),
+                   Container(
+                     padding: const EdgeInsets.all(12),
+                     decoration: BoxDecoration(color: cardColor, borderRadius: BorderRadius.circular(12), border: Border.all(color: borderColor)),
+                     child: Text(
+                       _isListening ? 'Listening... $_voiceTranscript' : 'Voice Transcript: $_voiceTranscript',
+                       style: TextStyle(color: textColor, fontSize: 13, fontStyle: FontStyle.italic),
+                     ),
+                   ),
+                ],
                 const SizedBox(height: 24),
 
                 // Sliders

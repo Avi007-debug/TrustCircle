@@ -1,30 +1,43 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() {
-  runApp(const TrustCircleApp());
+import 'core/theme/app_theme.dart';
+import 'firebase_options.dart';
+import 'providers/theme_provider.dart';
+import 'routes/app_router.dart';
+
+import 'services/notification_service.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  await notificationService.init();
+  runApp(
+    const ProviderScope(
+      child: TrustCircleApp(),
+    ),
+  );
 }
 
-class TrustCircleApp extends StatelessWidget {
+class TrustCircleApp extends ConsumerWidget {
   const TrustCircleApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeModeProvider);
+
+    return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'TrustCircle',
-      home: Scaffold(
-        backgroundColor: const Color(0xFF0F172A),
-        body: Center(
-          child: Text(
-            'TrustCircle',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      ),
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: themeMode,
+      routerConfig: appRouter,
     );
   }
 }

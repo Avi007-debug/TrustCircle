@@ -105,7 +105,7 @@ class _CheckinScreenState extends ConsumerState<CheckinScreen>
     final textColor = isDark ? AppColors.darkText : AppColors.lightText;
     final subColor = isDark ? AppColors.darkSubtext : AppColors.lightSubtext;
     final cardColor = isDark ? AppColors.darkSurface : AppColors.lightSurface;
-    final primary = isDark ? AppColors.tealPrimary : AppColors.warmTeal;
+    final primary = isDark ? AppColors.tealPrimary : AppColors.lavenderPrimary;
     final borderColor = isDark ? AppColors.darkBorder : AppColors.lightBorder;
 
     final hasPulsedAsync = ref.watch(hasPulsedTodayProvider);

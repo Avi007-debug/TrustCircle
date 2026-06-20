@@ -42,7 +42,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final textColor = isDark ? AppColors.darkText : AppColors.lightText;
     final subColor = isDark ? AppColors.darkSubtext : AppColors.lightSubtext;
     final cardColor = isDark ? AppColors.darkSurface : AppColors.lightSurface;
-    final primary = isDark ? AppColors.tealPrimary : AppColors.warmTeal;
+    final primary = isDark ? AppColors.tealPrimary : AppColors.lavenderPrimary;
     final borderColor = isDark ? AppColors.darkBorder : AppColors.lightBorder;
 
     final userAsync = ref.watch(currentUserProvider);
@@ -156,7 +156,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ]
                       : [
                           AppColors.lightSurface,
-                          AppColors.warmTealLight,
+                          AppColors.lavenderLight,
                         ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,

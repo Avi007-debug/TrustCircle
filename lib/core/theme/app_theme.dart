@@ -18,26 +18,26 @@ class AppColors {
   static const darkMuted      = Color(0xFF64748B);   // Slate 500
 
   // ── Light Theme ────────────────────────────────────────────────────────────
-  // Warm, accessible palette for broader age groups
-  static const lightBackground = Color(0xFFF8F7F4);  // Warm White
-  static const lightSurface    = Color(0xFFFFFFFF);  // Pure White
-  static const lightCard       = Color(0xFFF0EEE8);  // Warm Cream
-  static const lightBorder     = Color(0xFFE8E4DC);  // Warm Gray border
+  // Rich Lavender Theme
+  static const lightBackground = Color(0xFFF0E6FF);  // bg-primary
+  static const lightSurface    = Color(0xFFE8D9FF);  // bg-secondary
+  static const lightCard       = Color(0xFFDDC7FF);  // bg-tertiary
+  static const lightBorder     = Color(0xFFD4C5F9);  // border
 
-  static const warmTeal        = Color(0xFF0F9D8E);  // Slightly deeper teal - readable
-  static const warmTealLight   = Color(0xFFE0F7F5);  // Teal tint bg
-  static const warmTealAccent  = Color(0xFF007A6C);  // Teal for text
+  static const lavenderPrimary = Color(0xFF7C3AED);  // accent-primary
+  static const lavenderLight   = Color(0xFF6366F1);  // accent-secondary
+  static const lavenderAccent  = Color(0xFF8B5CF6);  // accent-hover
 
-  static const lightText       = Color(0xFF1A2332);  // Near-black warm
-  static const lightSubtext    = Color(0xFF5D6473);  // Warm gray
-  static const lightMuted      = Color(0xFF9AA0AE);  // Light muted
+  static const lightText       = Color(0xFF1E1B29);  // text-primary
+  static const lightSubtext    = Color(0xFF4A4560);  // text-secondary
+  static const lightMuted      = Color(0xFF6B6580);  // text-tertiary
 
   // ── Semantic Colors ────────────────────────────────────────────────────────
-  static const excellent  = Color(0xFF10B981); // Emerald
-  static const healthy    = Color(0xFF14B8A6); // Teal
+  static const excellent  = Color(0xFF059669); // accent-green (Light) / 10B981 (Dark)
+  static const healthy    = Color(0xFF0891B2); // accent-cyan
   static const watch      = Color(0xFFF59E0B); // Amber
-  static const risk       = Color(0xFFEF4444); // Red
-  static const riskLight  = Color(0xFFFEE2E2);
+  static const risk       = Color(0xFFDB2777); // accent-pink
+  static const riskLight  = Color(0xFFFCE7F3);
 
   // ── Gradients ──────────────────────────────────────────────────────────────
   static const darkGradient = LinearGradient(
@@ -47,7 +47,7 @@ class AppColors {
   );
 
   static const lightGradient = LinearGradient(
-    colors: [Color(0xFFF8F7F4), Color(0xFFEDF9F7)],
+    colors: [Color(0xFFF0E6FF), Color(0xFFE8D9FF)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
@@ -165,8 +165,8 @@ class AppTheme {
       brightness: Brightness.light,
       scaffoldBackgroundColor: AppColors.lightBackground,
       colorScheme: const ColorScheme.light(
-        primary: AppColors.warmTeal,
-        secondary: AppColors.warmTealLight,
+        primary: AppColors.lavenderPrimary,
+        secondary: AppColors.lavenderLight,
         surface: AppColors.lightSurface,
         onSurface: AppColors.lightText,
         outline: AppColors.lightBorder,
@@ -197,7 +197,7 @@ class AppTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.warmTeal,
+          backgroundColor: AppColors.lavenderPrimary,
           foregroundColor: Colors.white,
           minimumSize: const Size.fromHeight(56),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -218,7 +218,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.warmTeal, width: 2),
+          borderSide: const BorderSide(color: AppColors.lavenderPrimary, width: 2),
         ),
         labelStyle: const TextStyle(color: AppColors.lightSubtext, fontSize: 15),
         hintStyle: const TextStyle(color: AppColors.lightMuted),
@@ -228,16 +228,16 @@ class AppTheme {
       iconTheme: const IconThemeData(color: AppColors.lightSubtext),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: AppColors.lightSurface,
-        selectedItemColor: AppColors.warmTeal,
+        selectedItemColor: AppColors.lavenderPrimary,
         unselectedItemColor: AppColors.lightMuted,
         type: BottomNavigationBarType.fixed,
         elevation: 8,
       ),
       sliderTheme: SliderThemeData(
-        activeTrackColor: AppColors.warmTeal,
-        thumbColor: AppColors.warmTeal,
+        activeTrackColor: AppColors.lavenderPrimary,
+        thumbColor: AppColors.lavenderPrimary,
         inactiveTrackColor: AppColors.lightBorder,
-        overlayColor: AppColors.warmTeal.withOpacity(0.15),
+        overlayColor: AppColors.lavenderPrimary.withOpacity(0.15),
         trackHeight: 6,
       ),
       snackBarTheme: const SnackBarThemeData(

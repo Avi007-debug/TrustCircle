@@ -76,7 +76,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         : AppColors.lightBorder;
     final textColor = isDark ? AppColors.darkText : AppColors.lightText;
     final subColor = isDark ? AppColors.darkSubtext : AppColors.lightSubtext;
-    final primary = isDark ? AppColors.tealPrimary : AppColors.warmTeal;
+    final primary = isDark ? AppColors.tealPrimary : AppColors.lavenderPrimary;
 
     return Scaffold(
       backgroundColor: bgColor,

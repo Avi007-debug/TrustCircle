@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'core/theme/app_theme.dart';
+import 'routes/app_router.dart';
 
 void main() {
-  runApp(const TrustCircleApp());
+  runApp(
+    const ProviderScope(
+      child: TrustCircleApp(),
+    ),
+  );
 }
 
 class TrustCircleApp extends StatelessWidget {
@@ -9,22 +17,11 @@ class TrustCircleApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'TrustCircle',
-      home: Scaffold(
-        backgroundColor: const Color(0xFF0F172A),
-        body: Center(
-          child: Text(
-            'TrustCircle',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      ),
+      theme: AppTheme.lightTheme,
+      routerConfig: appRouter,
     );
   }
 }

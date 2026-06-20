@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../providers/auth_provider.dart';
+import '../../core/theme/app_theme.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends ConsumerState<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
   late Animation<double> _scaleAnimation;
+  bool _navigated = false;
 
   @override
   void initState() {
@@ -20,23 +25,13 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       vsync: this,
       duration: const Duration(milliseconds: 1500),
     );
-
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeIn),
     );
-
     _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
     );
-
     _controller.forward();
-
-    // Auto-navigate to login screen after 2.5 seconds
-    Future.delayed(const Duration(milliseconds: 2500), () {
-      if (mounted) {
-        context.go('/login');
-      }
-    });
   }
 
   @override
@@ -45,8 +40,22 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     super.dispose();
   }
 
+  void _navigate(bool isLoggedIn) {
+    if (_navigated || !mounted) return;
+    _navigated = true;
+    Future.delayed(const Duration(milliseconds: 2600), () {
+      if (mounted) {
+        context.go(isLoggedIn ? '/home' : '/login');
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authStateProvider);
+
+    authState.whenData((user) => _navigate(user != null));
+
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -54,9 +63,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color(0xFF0F172A), // Slate 900
-              Color(0xFF1E293B), // Slate 800
-              Color(0xFF0D9488), // Teal 600
+              AppColors.darkBackground,
+              AppColors.darkSurface,
+              AppColors.tealDark,
             ],
             stops: [0.0, 0.6, 1.0],
           ),
@@ -69,60 +78,58 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Logo Icon
+                  // Glowing shield logo
                   Container(
-                    width: 100,
-                    height: 100,
+                    width: 110,
+                    height: 110,
                     decoration: BoxDecoration(
-                      color: Colors.teal.shade400.withOpacity(0.15),
+                      color: AppColors.tealPrimary.withOpacity(0.15),
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: Colors.teal.shade300.withOpacity(0.4),
+                        color: AppColors.tealLight.withOpacity(0.4),
                         width: 2,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.teal.shade400.withOpacity(0.2),
-                          blurRadius: 20,
-                          spreadRadius: 5,
+                          color: AppColors.tealPrimary.withOpacity(0.3),
+                          blurRadius: 30,
+                          spreadRadius: 8,
                         ),
                       ],
                     ),
                     child: const Icon(
-                      Icons.shield_outlined,
-                      size: 50,
+                      Icons.favorite_rounded,
+                      size: 52,
                       color: Colors.white,
                     ),
                   ),
-                  const SizedBox(height: 24),
-                  // App Name
+                  const SizedBox(height: 28),
                   const Text(
                     'TrustCircle',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 36,
+                      fontSize: 38,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 1.2,
                     ),
                   ),
                   const SizedBox(height: 8),
-                  // Subtitle
                   Text(
                     'Your safe space for authentic connection',
                     style: TextStyle(
-                      color: Colors.teal.shade100.withOpacity(0.8),
+                      color: AppColors.tealGlow.withOpacity(0.85),
                       fontSize: 14,
                       letterSpacing: 0.5,
                     ),
                   ),
-                  const SizedBox(height: 60),
-                  // Progress indicator
-                  const SizedBox(
-                    width: 40,
-                    height: 40,
+                  const SizedBox(height: 72),
+                  SizedBox(
+                    width: 36,
+                    height: 36,
                     child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white70),
-                      strokeWidth: 3,
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(Colors.white.withOpacity(0.7)),
+                      strokeWidth: 2.5,
                     ),
                   ),
                 ],

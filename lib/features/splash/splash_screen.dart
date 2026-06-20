@@ -97,10 +97,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                         ),
                       ],
                     ),
-                    child: const Icon(
-                      Icons.favorite_rounded,
-                      size: 52,
-                      color: Colors.white,
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Image.asset('assets/images/logo.png'),
                     ),
                   ),
                   const SizedBox(height: 28),

@@ -57,9 +57,13 @@ class _GratitudeScreenState extends ConsumerState<GratitudeScreen> {
   }
 
   Future<void> _react(String gratitudeId, String emoji) async {
+    final user = ref.read(authStateProvider).asData?.value;
+    if (user == null) return;
+    
     await ref.read(firestoreServiceProvider).addReaction(
           gratitudeId: gratitudeId,
           emoji: emoji,
+          uid: user.uid,
         );
   }
 
@@ -84,7 +88,7 @@ class _GratitudeScreenState extends ConsumerState<GratitudeScreen> {
           icon: Icon(Icons.arrow_back_ios_new_rounded, color: textColor, size: 20),
           onPressed: () => context.pop(),
         ),
-        title: Text('Gratitude Chain ❤️',
+        title: Text('Appreciation Wall',
             style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
         actions: [
           if (circle != null)
@@ -125,7 +129,7 @@ class _GratitudeScreenState extends ConsumerState<GratitudeScreen> {
                     maxLines: 3,
                     minLines: 1,
                     decoration: InputDecoration(
-                      hintText: 'Thank you for... ❤️',
+                      hintText: 'Share something you appreciate...',
                       hintStyle:
                           TextStyle(color: subColor.withOpacity(0.6)),
                       contentPadding: const EdgeInsets.symmetric(
@@ -191,8 +195,8 @@ class _GratitudeScreenState extends ConsumerState<GratitudeScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text('❤️',
-                            style: const TextStyle(fontSize: 56)),
+                        Icon(Icons.volunteer_activism_rounded,
+                            size: 56, color: primary),
                         const SizedBox(height: 16),
                         Text(
                           'No gratitude posts yet',
@@ -299,7 +303,7 @@ class _GratitudeCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const Text('❤️', style: TextStyle(fontSize: 18)),
+              Icon(Icons.favorite_rounded, color: primary, size: 18),
             ],
           ),
           const SizedBox(height: 12),

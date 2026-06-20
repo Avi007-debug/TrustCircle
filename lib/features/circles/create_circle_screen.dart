@@ -61,7 +61,7 @@ class _CreateCircleScreenState extends ConsumerState<CreateCircleScreen> {
         backgroundColor:
             isDark ? AppColors.darkSurface : AppColors.lightSurface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: Text('Circle Created! 🎉',
+        title: Text('Circle Created',
             style: TextStyle(
                 color: isDark ? AppColors.darkText : AppColors.lightText,
                 fontWeight: FontWeight.bold)),

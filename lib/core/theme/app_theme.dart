@@ -2,42 +2,41 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
-  // ── Dark Theme ─────────────────────────────────────────────────────────────
-  static const darkBackground = Color(0xFF0F172A);   // Slate 900
-  static const darkSurface    = Color(0xFF1E293B);   // Slate 800
-  static const darkCard       = Color(0xFF243044);   // Slate 750
-  static const darkBorder     = Color(0xFF334155);   // Slate 700
+  // ── Dark Theme (Royal Purple & Blue) ───────────────────────────────────────
+  static const darkBackground = Color(0xFF14043D);
+  static const darkSurface    = Color(0xFF1E0B5B);
+  static const darkCard       = Color(0xFF1E0B5B);
+  static const darkBorder     = Color(0xFF2D187A);
 
-  static const tealPrimary    = Color(0xFF14B8A6);   // Teal 500
-  static const tealDark       = Color(0xFF0D9488);   // Teal 600
-  static const tealLight      = Color(0xFF5EEAD4);   // Teal 300
-  static const tealGlow       = Color(0xFF99F6E4);   // Teal 200
+  static const tealPrimary    = Color(0xFF0CBFE2); // primaryBlue
+  static const tealDark       = Color(0xFF047CBD);
+  static const tealLight      = Color(0xFF9CE5F1); // lightBlue
+  static const tealGlow       = Color(0xFF9CE5F1);
 
-  static const darkText       = Color(0xFFF1F5F9);   // Slate 100
-  static const darkSubtext    = Color(0xFF94A3B8);   // Slate 400
-  static const darkMuted      = Color(0xFF64748B);   // Slate 500
+  static const darkText       = Color(0xFFFFFFFF);
+  static const darkSubtext    = Color(0xFFC8C6D7);
+  static const darkMuted      = Color(0xFF7A789B);
 
-  // ── Light Theme ────────────────────────────────────────────────────────────
-  // Rich Lavender Theme
-  static const lightBackground = Color(0xFFF0E6FF);  // bg-primary
-  static const lightSurface    = Color(0xFFE8D9FF);  // bg-secondary
-  static const lightCard       = Color(0xFFDDC7FF);  // bg-tertiary
-  static const lightBorder     = Color(0xFFD4C5F9);  // border
+  // ── Light Theme (Warm Blue — no pure white) ────────────────────────────────
+  static const lightBackground = Color(0xFFF0F7FB);  // Soft blue tint
+  static const lightSurface    = Color(0xFFF7FBFE);  // Very light blue-white
+  static const lightCard       = Color(0xFFF7FBFE);
+  static const lightBorder     = Color(0xFFD6E9F2);  // Light blue border
 
-  static const lavenderPrimary = Color(0xFF7C3AED);  // accent-primary
-  static const lavenderLight   = Color(0xFF6366F1);  // accent-secondary
-  static const lavenderAccent  = Color(0xFF8B5CF6);  // accent-hover
+  static const lavenderPrimary = Color(0xFF047CBD); // primaryColor (blue)
+  static const lavenderLight   = Color(0xFF0CBFE2); // secondaryColor
+  static const lavenderAccent  = Color(0xFF9CE5F1); // accentColor
 
-  static const lightText       = Color(0xFF1E1B29);  // text-primary
-  static const lightSubtext    = Color(0xFF4A4560);  // text-secondary
-  static const lightMuted      = Color(0xFF6B6580);  // text-tertiary
+  static const lightText       = Color(0xFF1F2937);
+  static const lightSubtext    = Color(0xFF6B7280);
+  static const lightMuted      = Color(0xFF9CA3AF);
 
   // ── Semantic Colors ────────────────────────────────────────────────────────
-  static const excellent  = Color(0xFF059669); // accent-green (Light) / 10B981 (Dark)
-  static const healthy    = Color(0xFF0891B2); // accent-cyan
-  static const watch      = Color(0xFFF59E0B); // Amber
-  static const risk       = Color(0xFFDB2777); // accent-pink
-  static const riskLight  = Color(0xFFFCE7F3);
+  static const excellent  = Color(0xFF34C759); // Success
+  static const healthy    = Color(0xFF0CBFE2); 
+  static const watch      = Color(0xFFF59E0B);
+  static const risk       = Color(0xFFFF3B30); // Error
+  static const riskLight  = Color(0xFFFFE5E5);
 
   // ── Gradients ──────────────────────────────────────────────────────────────
   static const darkGradient = LinearGradient(
@@ -47,7 +46,7 @@ class AppColors {
   );
 
   static const lightGradient = LinearGradient(
-    colors: [Color(0xFFF0E6FF), Color(0xFFE8D9FF)],
+    colors: [Color(0xFFF0F7FB), Color(0xFFD6E9F2)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
@@ -188,8 +187,8 @@ class AppTheme {
       ),
       cardTheme: CardThemeData(
         color: AppColors.lightSurface,
-        elevation: 2,
-        shadowColor: Color(0x14000000),
+        elevation: 0,
+        shadowColor: const Color(0x0A000000),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
           side: const BorderSide(color: AppColors.lightBorder, width: 1),
@@ -202,12 +201,12 @@ class AppTheme {
           minimumSize: const Size.fromHeight(56),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-          elevation: 1,
+          elevation: 0,
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.lightCard,
+        fillColor: AppColors.lightSurface,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: const BorderSide(color: AppColors.lightBorder),
@@ -231,7 +230,7 @@ class AppTheme {
         selectedItemColor: AppColors.lavenderPrimary,
         unselectedItemColor: AppColors.lightMuted,
         type: BottomNavigationBarType.fixed,
-        elevation: 8,
+        elevation: 0,
       ),
       sliderTheme: SliderThemeData(
         activeTrackColor: AppColors.lavenderPrimary,

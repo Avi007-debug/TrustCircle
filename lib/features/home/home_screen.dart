@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/constants/app_constants.dart';
 import '../../data/models/circle_model.dart';
@@ -33,6 +34,82 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (score >= AppConstants.healthyThreshold) return AppColors.healthy;
     if (score >= AppConstants.watchThreshold) return AppColors.watch;
     return AppColors.risk;
+  }
+
+  void _showMembersSheet(BuildContext ctx, CircleModel circle, bool isDark, Color bgColor, Color textColor, Color subColor, Color primary) {
+    showModalBottomSheet(
+      context: ctx,
+      backgroundColor: bgColor,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (sheetCtx) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.6,
+          minChildSize: 0.4,
+          maxChildSize: 0.9,
+          expand: false,
+          builder: (_, scrollController) {
+            return Column(
+              children: [
+                const SizedBox(height: 12),
+                Container(width: 40, height: 4, decoration: BoxDecoration(color: subColor.withOpacity(0.3), borderRadius: BorderRadius.circular(2))),
+                const SizedBox(height: 16),
+                Text('${circle.name} Members', style: TextStyle(color: textColor, fontSize: 18, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 16),
+                Expanded(
+                  child: FutureBuilder<List<Map<String, dynamic>>>(
+                    future: ref.read(firestoreServiceProvider).getUsersByIds(circle.members),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator(color: primary));
+                      }
+                      if (snapshot.hasError || !snapshot.hasData) {
+                        return Center(child: Text('Failed to load members', style: TextStyle(color: subColor)));
+                      }
+                      
+                      final members = snapshot.data!;
+                      return ListView.builder(
+                        controller: scrollController,
+                        itemCount: members.length,
+                        itemBuilder: (context, index) {
+                          final m = members[index];
+                          final name = m['name'] as String? ?? 'Anonymous';
+                          final email = m['email'] as String? ?? '';
+                          final isCreator = m['uid'] == circle.createdBy;
+                          
+                          return ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor: primary.withOpacity(0.15),
+                              child: Text(name.isNotEmpty ? name[0].toUpperCase() : '?', style: TextStyle(color: primary, fontWeight: FontWeight.bold)),
+                            ),
+                            title: Row(
+                              children: [
+                                Text(name, style: TextStyle(color: textColor, fontWeight: FontWeight.w600)),
+                                if (isCreator) ...[
+                                  const SizedBox(width: 8),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(color: AppColors.watch.withOpacity(0.15), borderRadius: BorderRadius.circular(4)),
+                                    child: const Text('Admin', style: TextStyle(color: AppColors.watch, fontSize: 10, fontWeight: FontWeight.bold)),
+                                  ),
+                                ]
+                              ],
+                            ),
+                            subtitle: Text(email, style: TextStyle(color: subColor, fontSize: 12)),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -81,15 +158,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         automaticallyImplyLeading: false,
         title: Row(
           children: [
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                color: primary.withOpacity(0.15),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(Icons.favorite_rounded, color: primary, size: 16),
-            ),
+            Image.asset('assets/images/logo.png', width: 36, height: 36),
             const SizedBox(width: 10),
             Text(
               'TrustCircle',
@@ -131,7 +200,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           children: [
             // ── Greeting ──────────────────────────────────────────────────
             Text(
-              'Hello, $userName! 👋',
+              'Hello, $userName',
               style: TextStyle(
                   color: textColor,
                   fontSize: 24,
@@ -156,7 +225,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ]
                       : [
                           AppColors.lightSurface,
-                          AppColors.lavenderLight,
+                          const Color(0xFFD6E9F2),
                         ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -220,7 +289,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         Row(
                           children: [
                             _MiniStat(
-                              icon: '❤️',
+                              iconData: Icons.volunteer_activism_rounded,
                               value: '$gratitudeCount',
                               label: 'Posts',
                               textColor: textColor,
@@ -228,7 +297,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             ),
                             const SizedBox(width: 16),
                             _MiniStat(
-                              icon: '🔥',
+                              iconData: Icons.timeline_rounded,
                               value:
                                   '${weeklyPulses.isNotEmpty ? weeklyPulses.length : 0}',
                               label: 'Check-ins',
@@ -483,7 +552,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
                 child: Column(
                   children: [
-                    Text('🌟', style: const TextStyle(fontSize: 40)),
+                    Icon(Icons.group_add_rounded, size: 48, color: primary),
                     const SizedBox(height: 12),
                     Text('No circles yet',
                         style: TextStyle(
@@ -514,9 +583,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     borderColor: borderColor,
                     primary: primary,
                     onTap: () {
-                      ref.read(activeCircleIdProvider.notifier).set(
-                          circle.id);
+                      ref.read(activeCircleIdProvider.notifier).set(circle.id);
                     },
+                    onViewMembers: () => _showMembersSheet(context, circle, isDark, bgColor, textColor, subColor, primary),
                   )),
             ],
 
@@ -533,8 +602,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               children: [
                 Expanded(
                   child: _QuickAction(
-                    icon: '❤️',
-                    label: 'Gratitude',
+                    iconData: Icons.volunteer_activism_rounded,
+                    label: 'Appreciation',
                     onTap: () => context.push('/gratitude'),
                     primary: primary,
                     cardColor: cardColor,
@@ -545,8 +614,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: _QuickAction(
-                    icon: '✨',
-                    label: 'AI Insights',
+                    iconData: Icons.psychology_alt_rounded,
+                    label: 'AI Wisdom',
                     onTap: () => context.push('/insights'),
                     primary: primary,
                     cardColor: cardColor,
@@ -586,16 +655,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           },
           items: const [
             BottomNavigationBarItem(
-                icon: Icon(Icons.home_rounded), label: 'Home'),
+                icon: Icon(Icons.home_rounded), label: 'Sanctuary'),
             BottomNavigationBarItem(
-                icon: Icon(Icons.favorite_rounded), label: 'Pulse'),
+                icon: Icon(Icons.favorite_rounded), label: 'Trust Pulse'),
             BottomNavigationBarItem(
                 icon: Icon(Icons.volunteer_activism_rounded),
-                label: 'Gratitude'),
+                label: 'Appreciation'),
             BottomNavigationBarItem(
-                icon: Icon(Icons.auto_awesome_rounded), label: 'Insights'),
+                icon: Icon(Icons.auto_awesome_rounded), label: 'AI Wisdom'),
             BottomNavigationBarItem(
-                icon: Icon(Icons.person_rounded), label: 'Profile'),
+                icon: Icon(Icons.person_rounded), label: 'My Aura'),
           ],
         ),
       ),
@@ -660,14 +729,14 @@ class _TrustRing extends StatelessWidget {
 }
 
 class _MiniStat extends StatelessWidget {
-  final String icon;
+  final IconData iconData;
   final String value;
   final String label;
   final Color textColor;
   final Color subColor;
 
   const _MiniStat({
-    required this.icon,
+    required this.iconData,
     required this.value,
     required this.label,
     required this.textColor,
@@ -676,12 +745,14 @@ class _MiniStat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final primary = isDark ? AppColors.tealPrimary : AppColors.lavenderPrimary;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Text(icon, style: const TextStyle(fontSize: 14)),
+            Icon(iconData, size: 16, color: primary),
             const SizedBox(width: 4),
             Text(value,
                 style: TextStyle(
@@ -709,6 +780,7 @@ class _CircleCard extends StatelessWidget {
   final Color borderColor;
   final Color primary;
   final VoidCallback onTap;
+  final VoidCallback onViewMembers;
 
   const _CircleCard({
     required this.circle,
@@ -723,6 +795,7 @@ class _CircleCard extends StatelessWidget {
     required this.borderColor,
     required this.primary,
     required this.onTap,
+    required this.onViewMembers,
   });
 
   @override
@@ -800,9 +873,66 @@ class _CircleCard extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    '${circle.members.length} members · ${circle.type}',
-                    style: TextStyle(color: subColor, fontSize: 12),
+                  Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      GestureDetector(
+                        onTap: onViewMembers,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: primary.withOpacity(0.08),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.people_alt_rounded, color: primary, size: 12),
+                              const SizedBox(width: 4),
+                              Text(
+                                '${circle.members.length} Members',
+                                style: TextStyle(color: primary, fontSize: 11, fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Text(
+                        '· ${circle.type}',
+                        style: TextStyle(color: subColor, fontSize: 12),
+                      ),
+                      if (isActive)
+                        GestureDetector(
+                          onTap: () {
+                            Share.share('Join my TrustCircle using code: ${circle.inviteCode}\nDownload the app to connect!');
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: primary.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: primary.withOpacity(0.2)),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.share_rounded, color: primary, size: 12),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'Code: ${circle.inviteCode}',
+                                  style: TextStyle(
+                                    color: primary,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                 ],
               ),
@@ -833,7 +963,7 @@ class _CircleCard extends StatelessWidget {
 }
 
 class _QuickAction extends StatelessWidget {
-  final String icon;
+  final IconData iconData;
   final String label;
   final VoidCallback onTap;
   final Color primary;
@@ -842,7 +972,7 @@ class _QuickAction extends StatelessWidget {
   final Color borderColor;
 
   const _QuickAction({
-    required this.icon,
+    required this.iconData,
     required this.label,
     required this.onTap,
     required this.primary,
@@ -864,7 +994,15 @@ class _QuickAction extends StatelessWidget {
         ),
         child: Column(
           children: [
-            Text(icon, style: const TextStyle(fontSize: 28)),
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: primary.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(iconData, color: primary, size: 24),
+            ),
             const SizedBox(height: 8),
             Text(label,
                 style: TextStyle(

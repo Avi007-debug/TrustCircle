@@ -64,10 +64,12 @@ class FirestoreService {
     return _db
         .collection(AppConstants.circlesCollection)
         .where('members', arrayContains: uid)
-        .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snap) =>
-            snap.docs.map((d) => CircleModel.fromMap(d.data(), d.id)).toList());
+        .map((snap) {
+      final list = snap.docs.map((d) => CircleModel.fromMap(d.data(), d.id)).toList();
+      list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return list;
+    });
   }
 
   Future<CircleModel?> getCircle(String circleId) async {
@@ -75,6 +77,23 @@ class FirestoreService {
         await _db.collection(AppConstants.circlesCollection).doc(circleId).get();
     if (!snap.exists) return null;
     return CircleModel.fromMap(snap.data()!, snap.id);
+  }
+
+  Future<List<Map<String, dynamic>>> getUsersByIds(List<String> uids) async {
+    if (uids.isEmpty) return [];
+    
+    // Firestore whereIn limits to 10. For larger groups, we'd need batching.
+    // For this prototype, we'll assume circles are <= 10 members or batch it simply.
+    final List<Map<String, dynamic>> users = [];
+    for (var i = 0; i < uids.length; i += 10) {
+      final chunk = uids.sublist(i, i + 10 > uids.length ? uids.length : i + 10);
+      final snap = await _db
+          .collection(AppConstants.usersCollection)
+          .where('uid', whereIn: chunk)
+          .get();
+      users.addAll(snap.docs.map((d) => d.data()));
+    }
+    return users;
   }
 
   // ════════════════════════════════════════════════════════════════════════════
@@ -87,18 +106,17 @@ class FirestoreService {
   }) async {
     final now = DateTime.now();
     final startOfDay = DateTime(now.year, now.month, now.day);
-    final endOfDay = startOfDay.add(const Duration(days: 1));
 
     final snap = await _db
         .collection(AppConstants.pulsesCollection)
         .where('userId', isEqualTo: userId)
         .where('circleId', isEqualTo: circleId)
-        .where('timestamp', isGreaterThanOrEqualTo: Timestamp.fromDate(startOfDay))
-        .where('timestamp', isLessThan: Timestamp.fromDate(endOfDay))
-        .limit(1)
         .get();
 
-    return snap.docs.isNotEmpty;
+    return snap.docs.any((doc) {
+      final timestamp = (doc.data()['timestamp'] as Timestamp).toDate();
+      return timestamp.isAfter(startOfDay);
+    });
   }
 
   Future<PulseModel> submitPulse({
@@ -133,13 +151,14 @@ class FirestoreService {
         .collection(AppConstants.pulsesCollection)
         .where('userId', isEqualTo: userId)
         .where('circleId', isEqualTo: circleId)
-        .where('timestamp',
-            isGreaterThanOrEqualTo: Timestamp.fromDate(sevenDaysAgo))
-        .orderBy('timestamp', descending: false)
         .get();
-    return snap.docs
+    
+    final list = snap.docs
         .map((d) => PulseModel.fromMap(d.data(), d.id))
+        .where((p) => p.timestamp.isAfter(sevenDaysAgo))
         .toList();
+    list.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    return list;
   }
 
   /// Returns pulses for ALL members in a circle for the last N days
@@ -151,10 +170,14 @@ class FirestoreService {
     final snap = await _db
         .collection(AppConstants.pulsesCollection)
         .where('circleId', isEqualTo: circleId)
-        .where('timestamp', isGreaterThanOrEqualTo: Timestamp.fromDate(since))
-        .orderBy('timestamp', descending: false)
         .get();
-    return snap.docs.map((d) => PulseModel.fromMap(d.data(), d.id)).toList();
+    
+    final list = snap.docs
+        .map((d) => PulseModel.fromMap(d.data(), d.id))
+        .where((p) => p.timestamp.isAfter(since))
+        .toList();
+    list.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    return list;
   }
 
   // ════════════════════════════════════════════════════════════════════════════
@@ -174,7 +197,7 @@ class FirestoreService {
       authorName: authorName,
       circleId: circleId,
       message: message,
-      reactions: {'❤️': 0, '👏': 0, '🙏': 0},
+      userReactions: {},
       timestamp: DateTime.now(),
     );
     await ref.set(model.toMap());
@@ -185,22 +208,25 @@ class FirestoreService {
     return _db
         .collection(AppConstants.gratitudeCollection)
         .where('circleId', isEqualTo: circleId)
-        .orderBy('timestamp', descending: true)
-        .limit(50)
         .snapshots()
-        .map((snap) => snap.docs
-            .map((d) => GratitudeModel.fromMap(d.data(), d.id))
-            .toList());
+        .map((snap) {
+      final list = snap.docs
+          .map((d) => GratitudeModel.fromMap(d.data(), d.id))
+          .toList();
+      list.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+      return list;
+    });
   }
 
   Future<void> addReaction({
     required String gratitudeId,
     required String emoji,
+    required String uid,
   }) async {
     await _db
         .collection(AppConstants.gratitudeCollection)
         .doc(gratitudeId)
-        .update({'reactions.$emoji': FieldValue.increment(1)});
+        .update({'userReactions.$uid': emoji});
   }
 
   // ════════════════════════════════════════════════════════════════════════════
@@ -216,10 +242,11 @@ class FirestoreService {
     final snap = await _db
         .collection(AppConstants.insightsCollection)
         .where('circleId', isEqualTo: circleId)
-        .orderBy('timestamp', descending: true)
-        .limit(1)
         .get();
     if (snap.docs.isEmpty) return null;
-    return InsightModel.fromMap(snap.docs.first.data(), snap.docs.first.id);
+    
+    final list = snap.docs.map((d) => InsightModel.fromMap(d.data(), d.id)).toList();
+    list.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+    return list.first;
   }
 }

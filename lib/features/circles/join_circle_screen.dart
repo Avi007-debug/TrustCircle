@@ -46,7 +46,7 @@ class _JoinCircleScreenState extends ConsumerState<JoinCircleScreen> {
         ref.read(activeCircleIdProvider.notifier).set(circle.id);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Joined "${circle.name}" successfully! 🎉')),
+            SnackBar(content: Text('Joined "${circle.name}" successfully!')),
           );
           context.go('/home');
         }

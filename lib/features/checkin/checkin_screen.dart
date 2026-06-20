@@ -44,12 +44,12 @@ class _CheckinScreenState extends ConsumerState<CheckinScreen>
     super.dispose();
   }
 
-  String _emojiForValue(double v) {
-    if (v >= 8.5) return '🤩';
-    if (v >= 6.5) return '😊';
-    if (v >= 4.5) return '😐';
-    if (v >= 2.5) return '😔';
-    return '😞';
+  String _labelForValue(double v) {
+    if (v >= 8.5) return 'Great';
+    if (v >= 6.5) return 'Good';
+    if (v >= 4.5) return 'Okay';
+    if (v >= 2.5) return 'Low';
+    return 'Poor';
   }
 
   Color _colorForValue(double v) {
@@ -130,7 +130,7 @@ class _CheckinScreenState extends ConsumerState<CheckinScreen>
                       color: AppColors.excellent, size: 52),
                 ),
                 const SizedBox(height: 24),
-                Text('Pulse Submitted! ✨',
+                Text('Pulse Submitted',
                     style: TextStyle(color: textColor, fontSize: 24,
                         fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
@@ -138,7 +138,7 @@ class _CheckinScreenState extends ConsumerState<CheckinScreen>
                     style: TextStyle(color: primary, fontSize: 18,
                         fontWeight: FontWeight.w600)),
                 const SizedBox(height: 8),
-                Text('Keep checking in daily! 🔥',
+                Text('Keep checking in daily for stronger bonds.',
                     style: TextStyle(color: subColor, fontSize: 14)),
               ],
             ),
@@ -189,13 +189,13 @@ class _CheckinScreenState extends ConsumerState<CheckinScreen>
                           color: primary, size: 52),
                     ),
                     const SizedBox(height: 24),
-                    Text('Already Checked In Today! ✅',
+                    Text('Already Checked In Today',
                         textAlign: TextAlign.center,
                         style: TextStyle(color: textColor, fontSize: 22,
                             fontWeight: FontWeight.bold)),
                     const SizedBox(height: 12),
                     Text(
-                      'Come back tomorrow to submit your next Trust Pulse.\nConsistency builds trust! 💪',
+                      'Come back tomorrow to submit your next Trust Pulse.\nConsistency builds trust.',
                       textAlign: TextAlign.center,
                       style: TextStyle(color: subColor, fontSize: 14,
                           height: 1.6),
@@ -293,7 +293,7 @@ class _CheckinScreenState extends ConsumerState<CheckinScreen>
                     key: ValueKey(key),
                     question: q['question']!,
                     emoji: q['emoji']!,
-                    valueEmoji: _emojiForValue(value),
+                    valueLabel: _labelForValue(value),
                     value: value,
                     color: color,
                     cardColor: cardColor,
@@ -348,7 +348,7 @@ class _CheckinScreenState extends ConsumerState<CheckinScreen>
 class _PulseSliderCard extends StatelessWidget {
   final String question;
   final String emoji;
-  final String valueEmoji;
+  final String valueLabel;
   final double value;
   final Color color;
   final Color cardColor;
@@ -361,7 +361,7 @@ class _PulseSliderCard extends StatelessWidget {
     super.key,
     required this.question,
     required this.emoji,
-    required this.valueEmoji,
+    required this.valueLabel,
     required this.value,
     required this.color,
     required this.cardColor,
@@ -393,7 +393,17 @@ class _PulseSliderCard extends StatelessWidget {
                     style: TextStyle(color: textColor, fontSize: 15,
                         fontWeight: FontWeight.w600)),
               ),
-              Text(valueEmoji, style: const TextStyle(fontSize: 24)),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  valueLabel,
+                  style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 13),
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 12),

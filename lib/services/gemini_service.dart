@@ -9,7 +9,7 @@ class GeminiService {
 
   GenerativeModel get _getModel {
     _model ??= GenerativeModel(
-      model: 'gemini-1.5-flash',
+      model: 'gemini-2.5-flash',
       apiKey: AppConstants.geminiApiKey,
     );
     return _model!;
@@ -50,8 +50,8 @@ class GeminiService {
         : pulses.map((p) => p.safe).reduce((a, b) => a + b) / pulses.length;
 
     final prompt = '''
-You are an AI assistant for TrustCircle, a relationship health app.
-Analyze the following data for a trust circle and provide insights.
+You are "Aura", the AI Wisdom Guide for TrustCircle, a sanctuary app designed to build emotional safety and deepen relationships.
+You are analyzing a Trust Circle. Your goal is to provide a highly empathetic, insightful, and unique piece of wisdom based on the members' daily pulse check-ins and gratitude expressions.
 
 DATA:
 - Number of daily check-ins (last 7 days): ${pulses.length}
@@ -61,12 +61,17 @@ DATA:
 - Gratitude posts this week: $gratitudeCount
 
 INSTRUCTIONS:
-Respond ONLY with valid JSON matching exactly this structure (no extra text):
+1. "summary": Provide a 2-3 sentence deeply empathetic analysis of their emotional safety and connection. Use warm, poetic, and encouraging language (e.g. "Your sanctuary is glowing with appreciation...").
+2. "riskLevel": Must be exactly "Low", "Medium", or "High" based on the trust score.
+3. "suggestion": A creative, non-generic 1-2 sentence actionable suggestion to foster deeper connection (e.g., "Consider a vulnerability hour where everyone shares one hidden stressor").
+4. "conversationStarter": A thought-provoking, emotionally engaging question to spark meaningful dialogue.
+
+Respond ONLY with valid JSON matching exactly this structure (no extra text, no markdown block wrappers like ```json):
 {
-  "summary": "2-3 sentence summary of trust health",
-  "riskLevel": "Low" or "Medium" or "High",
-  "suggestion": "1-2 sentence actionable suggestion",
-  "conversationStarter": "An engaging question to start a trust conversation"
+  "summary": "",
+  "riskLevel": "",
+  "suggestion": "",
+  "conversationStarter": ""
 }
 ''';
 
@@ -79,7 +84,7 @@ Respond ONLY with valid JSON matching exactly this structure (no extra text):
       // Extract JSON from response
       final jsonStart = text.indexOf('{');
       final jsonEnd = text.lastIndexOf('}');
-      if (jsonStart == -1 || jsonEnd == -1) throw Exception('Invalid JSON response');
+      if (jsonStart == -1 || jsonEnd == -1) throw Exception('Invalid JSON response from Gemini');
 
       final jsonStr = text.substring(jsonStart, jsonEnd + 1);
       final data = jsonDecode(jsonStr) as Map<String, dynamic>;
@@ -94,16 +99,14 @@ Respond ONLY with valid JSON matching exactly this structure (no extra text):
         timestamp: DateTime.now(),
       );
     } catch (e) {
-      // Fallback insight on error
+      // Return the actual error so the user can see what failed with the API
       return InsightModel(
         id: '',
         circleId: circleId,
-        summary:
-            'Trust appears stable. Connection scores are within healthy range.',
+        summary: 'AI Generation Failed: $e\n\nPlease check if your Gemini API key is valid and has billing/quotas enabled.',
         riskLevel: avgTrust >= 75 ? 'Low' : (avgTrust >= 50 ? 'Medium' : 'High'),
-        suggestion: 'Keep up regular check-ins to maintain strong trust bonds.',
-        conversationStarter:
-            'What is one way we can support each other better this week?',
+        suggestion: 'Ensure your API key is correctly injected using --dart-define=GEMINI_API_KEY=...',
+        conversationStarter: 'Are we configured correctly?',
         timestamp: DateTime.now(),
       );
     }

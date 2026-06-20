@@ -5,6 +5,7 @@ import '../../core/theme/app_theme.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/circle_provider.dart';
 import '../../providers/theme_provider.dart';
+import '../../providers/notification_provider.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -32,7 +33,7 @@ class ProfileScreen extends ConsumerWidget {
               color: textColor, size: 20),
           onPressed: () => context.pop(),
         ),
-        title: Text('Profile',
+        title: Text('My Aura',
             style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
       ),
       body: SingleChildScrollView(
@@ -145,6 +146,27 @@ class ProfileScreen extends ConsumerWidget {
                         ),
                       ),
                       Divider(color: borderColor, height: 1),
+                      Consumer(
+                        builder: (context, ref, child) {
+                          final notificationsEnabled = ref.watch(notificationsEnabledProvider);
+                          return _SettingsTile(
+                            icon: Icons.notifications_active_outlined,
+                            label: 'Daily Reminders',
+                            subtitle: 'Get a nudge for your Trust Pulse',
+                            textColor: textColor,
+                            subColor: subColor,
+                            primary: primary,
+                            trailing: Switch(
+                              value: notificationsEnabled,
+                              onChanged: (val) {
+                                ref.read(notificationsEnabledProvider.notifier).toggle(val);
+                              },
+                              activeColor: primary,
+                            ),
+                          );
+                        },
+                      ),
+                      Divider(color: borderColor, height: 1),
                       _SettingsTile(
                         icon: Icons.group_add_outlined,
                         label: 'Create a Circle',
@@ -192,7 +214,7 @@ class ProfileScreen extends ConsumerWidget {
                 const SizedBox(height: 32),
 
                 Text(
-                  'TrustCircle v1.0.0 — Built with ❤️',
+                  'TrustCircle v1.0.0',
                   textAlign: TextAlign.center,
                   style: TextStyle(color: subColor, fontSize: 12),
                 ),

@@ -104,8 +104,10 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                         color: primary.withOpacity(0.15),
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(Icons.person_add_rounded,
-                          size: 36, color: primary),
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Image.asset('assets/images/logo.png'),
+                      ),
                     ),
                     const SizedBox(height: 20),
                     Text(

@@ -1,7 +1,8 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 class AppConstants {
   // ── Gemini AI ─────────────────────────────────────────────────────────────
-  // Replace with your actual Gemini API key from https://aistudio.google.com
-  static const String geminiApiKey = 'YOUR_GEMINI_API_KEY_HERE';
+  static String get geminiApiKey => dotenv.env['GEMINI_API_KEY'] ?? 'YOUR_GEMINI_API_KEY_HERE';
 
   // ── Trust Score Thresholds ─────────────────────────────────────────────────
   static const double excellentThreshold = 90.0;
@@ -29,25 +30,25 @@ class AppConstants {
     {
       'key': 'heard',
       'question': 'Did you feel heard today?',
-      'emoji': '👂',
+      'emoji': '◉',
     },
     {
       'key': 'respected',
       'question': 'Did you feel respected today?',
-      'emoji': '🤝',
+      'emoji': '◈',
     },
     {
       'key': 'safe',
       'question': 'Did you feel safe today?',
-      'emoji': '🛡️',
+      'emoji': '◆',
     },
     {
       'key': 'connected',
       'question': 'Did you feel connected today?',
-      'emoji': '💞',
+      'emoji': '●',
     },
   ];
 
   // ── Gratitude Reactions ────────────────────────────────────────────────────
-  static const List<String> reactions = ['❤️', '👏', '🙏'];
+  static const List<String> reactions = ['♡', '✦', '☆'];
 }

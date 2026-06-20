@@ -132,8 +132,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             ),
                           ],
                         ),
-                        child: Icon(Icons.favorite_rounded,
-                            size: 40, color: primary),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Image.asset('assets/images/logo.png'),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 20),

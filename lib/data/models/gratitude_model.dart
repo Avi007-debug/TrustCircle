@@ -6,7 +6,7 @@ class GratitudeModel {
   final String authorName;
   final String circleId;
   final String message;
-  final Map<String, int> reactions; // e.g. {'❤️': 3, '👏': 1, '🙏': 0}
+  final Map<String, String> userReactions; // { uid: emoji }
   final DateTime timestamp;
 
   const GratitudeModel({
@@ -15,19 +15,27 @@ class GratitudeModel {
     required this.authorName,
     required this.circleId,
     required this.message,
-    required this.reactions,
+    required this.userReactions,
     required this.timestamp,
   });
 
+  Map<String, int> get reactions {
+    final counts = <String, int>{};
+    for (final emoji in userReactions.values) {
+      counts[emoji] = (counts[emoji] ?? 0) + 1;
+    }
+    return counts;
+  }
+
   factory GratitudeModel.fromMap(Map<String, dynamic> map, String docId) {
-    final rawReactions = map['reactions'] as Map<String, dynamic>? ?? {};
+    final rawReactions = map['userReactions'] as Map<String, dynamic>? ?? {};
     return GratitudeModel(
       id: docId,
       authorId: map['authorId'] as String? ?? '',
       authorName: map['authorName'] as String? ?? 'Anonymous',
       circleId: map['circleId'] as String? ?? '',
       message: map['message'] as String? ?? '',
-      reactions: rawReactions.map((k, v) => MapEntry(k, (v as num).toInt())),
+      userReactions: rawReactions.map((k, v) => MapEntry(k, v.toString())),
       timestamp: (map['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }
@@ -37,17 +45,17 @@ class GratitudeModel {
         'authorName': authorName,
         'circleId': circleId,
         'message': message,
-        'reactions': reactions,
+        'userReactions': userReactions,
         'timestamp': Timestamp.fromDate(timestamp),
       };
 
-  GratitudeModel copyWith({Map<String, int>? reactions}) => GratitudeModel(
+  GratitudeModel copyWith({Map<String, String>? userReactions}) => GratitudeModel(
         id: id,
         authorId: authorId,
         authorName: authorName,
         circleId: circleId,
         message: message,
-        reactions: reactions ?? this.reactions,
+        userReactions: userReactions ?? this.userReactions,
         timestamp: timestamp,
       );
 }

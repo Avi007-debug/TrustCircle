@@ -120,7 +120,7 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
           icon: Icon(Icons.arrow_back_ios_new_rounded, color: textColor, size: 20),
           onPressed: () => context.pop(),
         ),
-        title: Text('AI Insights ✨',
+        title: Text('AI Wisdom',
             style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
         actions: [
           if (circle != null)
@@ -166,7 +166,7 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
                     ),
                     child: Column(
                       children: [
-                        const Text('🤖', style: TextStyle(fontSize: 48)),
+                        Icon(Icons.psychology_alt_rounded, size: 56, color: primary),
                         const SizedBox(height: 12),
                         Text(
                           'Powered by Gemini AI',
@@ -232,8 +232,8 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
                         children: [
                           Row(
                             children: [
-                              const Text('💬',
-                                  style: TextStyle(fontSize: 20)),
+                              Icon(Icons.chat_bubble_outline_rounded,
+                                  color: AppColors.excellent, size: 20),
                               const SizedBox(width: 8),
                               Text(
                                 "Today's Conversation Prompt",
@@ -310,7 +310,7 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
 
                     // Summary card
                     _InsightCard(
-                      icon: '📊',
+                      iconData: Icons.bar_chart_rounded,
                       title: 'Summary',
                       content: _insight!.summary,
                       cardColor: cardColor,
@@ -323,7 +323,7 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
 
                     // Suggestion card
                     _InsightCard(
-                      icon: '💡',
+                      iconData: Icons.lightbulb_outline_rounded,
                       title: 'Suggestion',
                       content: _insight!.suggestion,
                       cardColor: cardColor,
@@ -337,7 +337,7 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
                     Center(
                       child: Column(
                         children: [
-                          Text('✨', style: const TextStyle(fontSize: 48)),
+                          Icon(Icons.auto_awesome_outlined, size: 48, color: primary),
                           const SizedBox(height: 16),
                           Text(
                             'No insights yet',
@@ -366,7 +366,7 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
 }
 
 class _InsightCard extends StatelessWidget {
-  final String icon;
+  final IconData iconData;
   final String title;
   final String content;
   final Color cardColor;
@@ -376,7 +376,7 @@ class _InsightCard extends StatelessWidget {
   final Color primary;
 
   const _InsightCard({
-    required this.icon,
+    required this.iconData,
     required this.title,
     required this.content,
     required this.cardColor,
@@ -400,7 +400,7 @@ class _InsightCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Text(icon, style: const TextStyle(fontSize: 20)),
+              Icon(iconData, size: 20, color: primary),
               const SizedBox(width: 8),
               Text(title,
                   style: TextStyle(

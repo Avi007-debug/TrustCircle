@@ -103,10 +103,11 @@ class FirestoreService {
     return UserModel.fromMap(snap.data()!);
   }
 
-  Future<DateTime?> getLastActivityDate(String uid) async {
+  Future<DateTime?> getLastActivityDate(String uid, {required String circleId}) async {
     final snap = await _db
         .collection(AppConstants.pulsesCollection)
         .where('userId', isEqualTo: uid)
+        .where('circleId', isEqualTo: circleId)
         .get();
     
     if (snap.docs.isEmpty) return null;
@@ -116,6 +117,28 @@ class FirestoreService {
         .toList();
     dates.sort((a, b) => b.compareTo(a));
     return dates.first;
+  }
+
+  Future<void> updateUserName(String uid, String newName) async {
+    await _db.collection(AppConstants.usersCollection).doc(uid).update({
+      'name': newName,
+    });
+  }
+
+  Future<void> leaveCircle(String circleId, String uid) async {
+    await _db.collection(AppConstants.circlesCollection).doc(circleId).update({
+      'members': FieldValue.arrayRemove([uid]),
+    });
+  }
+
+  Future<void> removeMember(String circleId, String memberUid) async {
+    await _db.collection(AppConstants.circlesCollection).doc(circleId).update({
+      'members': FieldValue.arrayRemove([memberUid]),
+    });
+  }
+
+  Future<void> deleteCircle(String circleId) async {
+    await _db.collection(AppConstants.circlesCollection).doc(circleId).delete();
   }
 
   // ════════════════════════════════════════════════════════════════════════════

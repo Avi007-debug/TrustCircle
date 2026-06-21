@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/theme/app_theme.dart';
 import '../../providers/auth_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SignupScreen extends ConsumerStatefulWidget {
   const SignupScreen({super.key});
@@ -28,6 +29,12 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     super.dispose();
   }
 
+  String _friendlyError(String msg) {
+    if (msg.contains('email-already-in-use')) return 'This email is already registered. Try signing in.';
+    if (msg.contains('weak-password')) return 'Password is too weak. Use at least 6 characters.';
+    return 'Sign-up failed. Please try again.';
+  }
+
   Future<void> _handleSignup() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() { _isLoading = true; _errorMessage = null; });
@@ -37,16 +44,17 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
             email: _emailController.text.trim(),
             password: _passwordController.text,
           );
-      if (mounted) context.go('/home');
+      if (mounted) {
+        final prefs = await SharedPreferences.getInstance();
+        final onboardingComplete = prefs.getBool('onboarding_complete') ?? false;
+        if (!onboardingComplete) {
+          context.go('/onboarding');
+        } else {
+          context.go('/home');
+        }
+      }
     } catch (e) {
-      final msg = e.toString();
-      setState(() {
-        _errorMessage = msg.contains('email-already-in-use')
-            ? 'This email is already registered. Try signing in.'
-            : msg.contains('weak-password')
-                ? 'Password is too weak. Use at least 6 characters.'
-                : 'Sign-up failed. Please try again.';
-      });
+      setState(() { _errorMessage = _friendlyError(e.toString()); });
     } finally {
       if (mounted) setState(() { _isLoading = false; });
     }

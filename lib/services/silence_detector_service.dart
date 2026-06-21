@@ -13,53 +13,64 @@ class SilenceDetectorService {
   /// The "day" boundary is 8 PM (configurable in NotificationService.dayStartHour).
   /// Returns a list of maps with 'uid', 'name', 'daysSilent'.
   /// Also fires a push notification for each silent member.
-  Future<List<Map<String, dynamic>>> getSilentMembers(List<String> memberIds) async {
+  Future<List<Map<String, dynamic>>> getSilentMembers(String circleId, List<String> memberIds) async {
     final List<Map<String, dynamic>> silentMembers = [];
     final now = DateTime.now();
 
     for (final uid in memberIds) {
-      final lastActivity = await _firestoreService.getLastActivityDate(uid);
+      final UserModel? user = await _firestoreService.getUser(uid);
+      if (user == null) continue;
 
+      final lastActivity = await _firestoreService.getLastActivityDate(uid, circleId: circleId);
       int daysSilent = 0;
 
-      if (lastActivity != null) {
-        // Adjust for "day starts at 8 PM" logic:
-        // If it's past 8 PM, the current trust-day started at today 8 PM.
-        // If it's before 8 PM, the current trust-day started at yesterday 8 PM.
-        final dayStartHour = NotificationService.dayStartHour;
-        DateTime currentDayStart;
-        if (now.hour >= dayStartHour) {
-          currentDayStart = DateTime(now.year, now.month, now.day, dayStartHour);
-        } else {
-          currentDayStart = DateTime(now.year, now.month, now.day, dayStartHour)
-              .subtract(const Duration(days: 1));
-        }
+      // Determine the reference start time (last activity OR account creation)
+      final DateTime referenceDate = lastActivity ?? user.createdAt;
 
-        daysSilent = currentDayStart.difference(lastActivity).inDays;
+      // Adjust for "day starts at 8 PM" logic
+      final dayStartHour = NotificationService.dayStartHour;
+      DateTime currentDayStart;
+      if (now.hour >= dayStartHour) {
+        currentDayStart = DateTime(now.year, now.month, now.day, dayStartHour);
       } else {
-        // Never submitted a pulse — treat as 999 days silent
-        daysSilent = 999;
+        currentDayStart = DateTime(now.year, now.month, now.day, dayStartHour)
+            .subtract(const Duration(days: 1));
       }
+
+      daysSilent = currentDayStart.difference(referenceDate).inDays;
+      if (daysSilent < 0) daysSilent = 0; // Prevent negative days for brand new users
 
       if (daysSilent >= 3) {
-        final UserModel? user = await _firestoreService.getUser(uid);
-        if (user != null) {
-          final name = user.name.isNotEmpty ? user.name : 'A member';
-          silentMembers.add({
-            'uid': uid,
-            'name': name,
-            'daysSilent': daysSilent,
-          });
-
-          // Fire a push notification for this silent member
-          await notificationService.showSilenceAlert(name, daysSilent);
-        }
+        final name = user.name.isNotEmpty ? user.name : 'A member';
+        silentMembers.add({
+          'uid': uid,
+          'name': name,
+          'daysSilent': daysSilent,
+        });
       }
     }
+
+    // Fire push notifications after gathering all silent members
+    if (silentMembers.isNotEmpty) {
+      if (silentMembers.length == 1) {
+        await notificationService.showSilenceAlert(
+            silentMembers.first['name'], silentMembers.first['daysSilent']);
+      } else {
+        await notificationService.showAggregatedSilenceAlert(
+            silentMembers.length, silentMembers.first['name']);
+      }
+    }
+
     return silentMembers;
   }
 }
 
 final silenceDetectorProvider = Provider<SilenceDetectorService>((ref) {
   return SilenceDetectorService(ref.read(firestoreServiceProvider));
+});
+
+final silentMembersProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
+  final circle = ref.watch(activeCircleProvider);
+  if (circle == null) return [];
+  return ref.read(silenceDetectorProvider).getSilentMembers(circle.id, circle.members);
 });

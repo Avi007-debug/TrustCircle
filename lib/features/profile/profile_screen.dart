@@ -6,6 +6,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/circle_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../providers/notification_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -57,42 +58,54 @@ class ProfileScreen extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.all(28),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        primary.withOpacity(0.2),
-                        primary.withOpacity(0.05),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
+                    color: cardColor,
                     borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: primary.withOpacity(0.2)),
+                    border: Border.all(color: borderColor),
                   ),
                   child: Column(
                     children: [
-                      CircleAvatar(
-                        radius: 40,
-                        backgroundColor: primary.withOpacity(0.2),
-                        backgroundImage: (user?.photoUrl.isNotEmpty ?? false)
-                            ? NetworkImage(user!.photoUrl)
-                            : null,
-                        child: (user?.photoUrl.isEmpty ?? true)
-                            ? Text(
-                                initial,
-                                style: TextStyle(
-                                    color: primary,
-                                    fontSize: 32,
-                                    fontWeight: FontWeight.bold),
-                              )
-                            : null,
+                      Container(
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          color: primary,
+                          shape: BoxShape.circle,
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          initial,
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold),
+                        ),
                       ),
                       const SizedBox(height: 16),
-                      Text(
-                        name,
-                        style: TextStyle(
-                            color: textColor,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            name,
+                            style: TextStyle(
+                                color: textColor,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(width: 8),
+                          GestureDetector(
+                            onTap: () {
+                              _showEditNameDialog(context, ref, user!.uid, name, bgColor, textColor, primary, subColor);
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: primary.withOpacity(0.1),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(Icons.edit_rounded, color: primary, size: 16),
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 4),
                       Text(email,
@@ -191,6 +204,58 @@ class ProfileScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 16),
 
+                // Professional Settings card
+                Container(
+                  decoration: BoxDecoration(
+                    color: cardColor,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: borderColor),
+                  ),
+                  child: Column(
+                    children: [
+                      _SettingsTile(
+                        icon: Icons.person_outline_rounded,
+                        label: 'Account Settings',
+                        subtitle: 'Update profile and security',
+                        textColor: textColor,
+                        subColor: subColor,
+                        primary: primary,
+                        onTap: () => context.push('/profile/settings'),
+                      ),
+                      Divider(color: borderColor, height: 1),
+                      _SettingsTile(
+                        icon: Icons.privacy_tip_outlined,
+                        label: 'Privacy & Security',
+                        subtitle: 'Manage your data',
+                        textColor: textColor,
+                        subColor: subColor,
+                        primary: primary,
+                        onTap: () => context.push('/profile/privacy'),
+                      ),
+                      Divider(color: borderColor, height: 1),
+                      _SettingsTile(
+                        icon: Icons.help_outline_rounded,
+                        label: 'Help & Support',
+                        subtitle: 'FAQ and contact',
+                        textColor: textColor,
+                        subColor: subColor,
+                        primary: primary,
+                        onTap: () => context.push('/profile/help'),
+                      ),
+                      Divider(color: borderColor, height: 1),
+                      _SettingsTile(
+                        icon: Icons.info_outline_rounded,
+                        label: 'About TrustCircle',
+                        subtitle: 'Terms and Privacy Policy',
+                        textColor: textColor,
+                        subColor: subColor,
+                        primary: primary,
+                        onTap: () => context.push('/profile/about'),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
                 // Logout card
                 Container(
                   decoration: BoxDecoration(
@@ -206,6 +271,10 @@ class ProfileScreen extends ConsumerWidget {
                     subColor: subColor,
                     primary: AppColors.risk,
                     onTap: () async {
+                      // Clear onboarding preference so new accounts see the walkthrough during demos
+                      final prefs = await SharedPreferences.getInstance();
+                      await prefs.remove('onboarding_complete');
+                      
                       await ref.read(authServiceProvider).signOut();
                       if (context.mounted) context.go('/login');
                     },
@@ -261,6 +330,48 @@ class _StatBadge extends StatelessWidget {
       ),
     );
   }
+}
+
+void _showEditNameDialog(BuildContext context, WidgetRef ref, String uid, String currentName, Color bgColor, Color textColor, Color primary, Color subColor) {
+  final controller = TextEditingController(text: currentName);
+  showDialog(
+    context: context,
+    builder: (ctx) {
+      return AlertDialog(
+        backgroundColor: bgColor,
+        title: Text('Edit Name', style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
+        content: TextField(
+          controller: controller,
+          style: TextStyle(color: textColor),
+          decoration: InputDecoration(
+            hintText: 'Enter your name',
+            hintStyle: TextStyle(color: subColor),
+            enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: subColor.withOpacity(0.5))),
+            focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: primary)),
+          ),
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text('Cancel', style: TextStyle(color: subColor)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: primary, foregroundColor: Colors.white),
+            onPressed: () async {
+              final newName = controller.text.trim();
+              if (newName.isNotEmpty && newName != currentName) {
+                await ref.read(firestoreServiceProvider).updateUserName(uid, newName);
+                ref.invalidate(currentUserProvider);
+              }
+              if (ctx.mounted) Navigator.pop(ctx);
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      );
+    },
+  );
 }
 
 class _SettingsTile extends StatelessWidget {

@@ -13,6 +13,7 @@ import '../features/gratitude/gratitude_screen.dart';
 import '../features/insights/insights_screen.dart';
 import '../features/resolve/resolve_screen.dart';
 import '../features/onboarding/onboarding_screen.dart';
+import '../features/profile/settings_screens.dart';
 
 GoRouter createRouter(WidgetRef ref) {
   return GoRouter(
@@ -30,6 +31,10 @@ GoRouter createRouter(WidgetRef ref) {
       GoRoute(path: '/insights',  builder: (_, __) => const InsightsScreen()),
       GoRoute(path: '/resolve',   builder: (_, __) => const ResolveScreen()),
       GoRoute(path: '/onboarding', builder: (_, __) => const OnboardingScreen()),
+      GoRoute(path: '/profile/settings', builder: (_, __) => const AccountSettingsScreen()),
+      GoRoute(path: '/profile/privacy', builder: (_, __) => const PrivacySecurityScreen()),
+      GoRoute(path: '/profile/help', builder: (_, __) => const HelpSupportScreen()),
+      GoRoute(path: '/profile/about', builder: (_, __) => const AboutScreen()),
     ],
   );
 }
@@ -50,5 +55,9 @@ final GoRouter appRouter = GoRouter(
     GoRoute(path: '/insights',  builder: (_, __) => const InsightsScreen()),
     GoRoute(path: '/resolve',   builder: (_, __) => const ResolveScreen()),
     GoRoute(path: '/onboarding', builder: (_, __) => const OnboardingScreen()),
+    GoRoute(path: '/profile/settings', builder: (_, __) => const AccountSettingsScreen()),
+    GoRoute(path: '/profile/privacy', builder: (_, __) => const PrivacySecurityScreen()),
+    GoRoute(path: '/profile/help', builder: (_, __) => const HelpSupportScreen()),
+    GoRoute(path: '/profile/about', builder: (_, __) => const AboutScreen()),
   ],
 );

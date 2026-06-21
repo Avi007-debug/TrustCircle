@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fl_chart/fl_chart.dart';
 import '../data/models/pulse_model.dart';
 import 'auth_provider.dart';
 import 'circle_provider.dart';
@@ -43,6 +44,62 @@ final circleTrustScoreProvider = Provider<double>((ref) {
   if (pulses.isEmpty) return 0.0;
   final total = pulses.map((p) => p.trustScore).reduce((a, b) => a + b);
   return total / pulses.length;
+});
+
+/// Fetches the trust score for a specific circle
+final specificCircleScoreProvider = FutureProvider.family<double, String>((ref, circleId) async {
+  final pulses = await ref.read(firestoreServiceProvider).getCirclePulses(circleId: circleId);
+  if (pulses.isEmpty) return 0.0;
+  final total = pulses.map((p) => p.trustScore).reduce((a, b) => a + b);
+  return total / pulses.length;
+});
+
+/// Computed average trust score for the current user (0-100)
+final individualTrustScoreProvider = Provider<double>((ref) {
+  final pulses = ref.watch(weeklyPulsesProvider).asData?.value ?? [];
+  if (pulses.isEmpty) return 0.0;
+  final total = pulses.map((p) => p.trustScore).reduce((a, b) => a + b);
+  return total / pulses.length;
+});
+
+/// Grouped daily averages for the circle trend graph
+final circleDailyAveragesProvider = Provider<List<FlSpot>>((ref) {
+  final pulses = ref.watch(circlePulsesProvider).asData?.value ?? [];
+  if (pulses.isEmpty) return [];
+
+  // Group by day (YYYY-MM-DD)
+  final Map<String, List<double>> grouped = {};
+  for (final p in pulses) {
+    final dateKey = "${p.timestamp.year}-${p.timestamp.month.toString().padLeft(2, '0')}-${p.timestamp.day.toString().padLeft(2, '0')}";
+    grouped.putIfAbsent(dateKey, () => []).add(p.trustScore);
+  }
+
+  // Sort keys chronologically
+  final sortedKeys = grouped.keys.toList()..sort();
+  
+  // Create spots
+  final List<FlSpot> spots = [];
+  for (int i = 0; i < sortedKeys.length; i++) {
+    final scores = grouped[sortedKeys[i]]!;
+    final avg = scores.reduce((a, b) => a + b) / scores.length;
+    spots.add(FlSpot(i.toDouble(), avg));
+  }
+  return spots;
+});
+
+/// Corresponding dates for the circle trend graph's X-axis
+final circleDailyDatesProvider = Provider<List<DateTime>>((ref) {
+  final pulses = ref.watch(circlePulsesProvider).asData?.value ?? [];
+  if (pulses.isEmpty) return [];
+
+  final Map<String, DateTime> grouped = {};
+  for (final p in pulses) {
+    final dateKey = "${p.timestamp.year}-${p.timestamp.month.toString().padLeft(2, '0')}-${p.timestamp.day.toString().padLeft(2, '0')}";
+    if (!grouped.containsKey(dateKey)) grouped[dateKey] = p.timestamp;
+  }
+
+  final sortedKeys = grouped.keys.toList()..sort();
+  return sortedKeys.map((k) => grouped[k]!).toList();
 });
 
 /// Trend: 'Improving', 'Stable', or 'Declining'

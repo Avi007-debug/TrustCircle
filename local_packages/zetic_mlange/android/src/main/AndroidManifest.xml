@@ -1,0 +1,40 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <uses-native-library
+            android:name="libOpenCL.so"
+            android:required="false" />
+        <uses-native-library
+            android:name="libOpenCL-car.so"
+            android:required="false" />
+        <uses-native-library
+            android:name="libOpenCL-pixel.so"
+            android:required="false" />
+        <uses-native-library
+            android:name="libvndksupport.so"
+            android:required="false" />
+        <uses-native-library
+            android:name="libcdsprpc.so"
+            android:required="false" />
+        <uses-native-library
+            android:name="libedgetpu_util.so"
+            android:required="false" />
+        <uses-native-library
+            android:name="libedgetpu_litert.so"
+            android:required="false" />
+        <uses-native-library
+            android:name="libneuronusdk_adapter.mtk.so"
+            android:required="false" />
+        <uses-native-library
+            android:name="libneuron_adapter_mgvi.so"
+            android:required="false" />
+        <uses-native-library
+            android:name="libneuronusdk_adapter.9.mtk.so"
+            android:required="false" />
+
+        <provider
+            android:name="com.zeticai.mlange.core.ffi.MlangeFfiInitProvider"
+            android:authorities="${applicationId}.mlange-ffi-init"
+            android:exported="false"
+            android:initOrder="100" />
+    </application>
+</manifest>

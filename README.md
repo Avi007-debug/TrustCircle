@@ -68,14 +68,18 @@
 
 ---
 
-## 🤖 Melange AI Integration Plan
+## 🤖 Hybrid AI Architecture (Cloud + On-Device)
 
-As part of the hackathon's requirement for on-device AI functionality, TrustCircle is architected to seamlessly integrate with **Melange AI**. Currently, it uses a simulated on-device heuristic that runs entirely locally, but the app is fully prepped to swap in a real Melange model:
+TrustCircle now features a robust **Hybrid AI Architecture** allowing users to seamlessly transition between Cloud AI (Gemini) and On-Device AI (Zetic MLange + TinyLlama + Whisper).
 
-1. **Native Kotlin Compatibility:** The Android app is built using `MainActivity.kt` (Kotlin), ensuring seamless compatibility with Melange's native Android SDKs.
-2. **Model Export:** A sentiment analysis model (like DistilBERT) fine-tuned on the Melange platform can be exported as a `.tflite` file.
-3. **Integration:** The exported model is placed in `assets/models/melange_sentiment.tflite` and inferred using the `tflite_flutter` package inside the existing `LocalAiService`.
-4. **Privacy First:** Because the Melange model runs 100% on-device, users can submit voice/text check-ins even in Airplane Mode. Emotional journal data never leaves the phone.
+### 1. Zetic MLange On-Device Integration
+- **True Offline Inference:** Integrated `zetic_mlange` to download and run the `meta/TinyLlama-1.1B-Chat-v1.0` and `OpenAI/whisper-tiny-decoder` models natively on the user's Android hardware.
+- **Privacy First:** Users can explicitly toggle **"Use On-Device AI for Privacy"** in the UI. When enabled, their voice transcriptions are processed 100% locally by TinyLlama, guaranteeing their emotional data never leaves the phone for analysis.
+- **Offline Fallback:** If the user loses internet connection, the `AiRouterService` automatically intercepts the voice check-in and routes it to the local Melange models.
+
+### 2. Smart Submission Syncing
+- While the AI grading can happen completely offline for privacy or connectivity reasons, submitting the pulse to the circle still requires an internet connection (Firestore).
+- **Offline Caching:** If a user submits a pulse while offline, TrustCircle saves it locally to the device and displays a notification. The pulse is then automatically synced to the cloud the moment the device regains connectivity.
 
 ---
 
@@ -111,7 +115,7 @@ As part of the hackathon's requirement for on-device AI functionality, TrustCirc
 
 ### AI & Voice
 - **AI Model:** Google Gemini API
-- **On-Device AI:** Melange fallback simulated heuristic (Ready for `.tflite` export)
+- **On-Device AI:** Zetic MLange (TinyLlama & Whisper) + Offline Heuristic
 - **Audio Processing:** Speech-to-Text
 
 ### Development & Testing
@@ -143,8 +147,9 @@ As part of the hackathon's requirement for on-device AI functionality, TrustCirc
 - [x] **New:** Voice Check-In (transcribes speech to auto-set sliders)
 - [x] **New:** Silence Detector (banners when members are inactive)
 - [x] **New:** Resolve Mode (auto-triggers below 50% trust with Gemini advice)
-- [x] **New:** WhatsApp-style notifications (real-time high priority alerts)
-- [x] **New:** Melange On-Device architecture ready
+- [x] **New:** Hybrid AI Architecture (Gemini Cloud + Zetic Melange On-Device)
+- [x] **New:** Privacy toggle to force local inference
+- [x] **New:** Offline Submission Caching (Auto-sync)
 
 ---
 
@@ -229,5 +234,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Last Updated:** June 20, 2026  
+**Last Updated:** June 21, 2026  
 **Status:** Hackathon Build Complete ✅

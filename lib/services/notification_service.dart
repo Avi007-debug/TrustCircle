@@ -225,6 +225,28 @@ class NotificationService {
     );
   }
 
+  Future<void> showAggregatedSilenceAlert(int count, String firstMemberName) async {
+    await init();
+
+    const AndroidNotificationDetails androidDetails =
+        AndroidNotificationDetails(
+      'silence_detector',
+      'Silence Alerts',
+      channelDescription: 'Alerts when circle members go quiet',
+      importance: Importance.high,
+      priority: Priority.high,
+    );
+    const NotificationDetails details =
+        NotificationDetails(android: androidDetails);
+
+    await flutterLocalNotificationsPlugin.show(
+      DateTime.now().millisecondsSinceEpoch.remainder(100000),
+      '🤫 $firstMemberName and ${count - 1} more may need support',
+      'Multiple members haven\'t checked in recently. Tap to view.',
+      details,
+    );
+  }
+
   // ═══════════════════════════════════════════════════════════════════════════
   // RESOLVE MODE NOTIFICATION
   // Shown when circle trust score drops below threshold.

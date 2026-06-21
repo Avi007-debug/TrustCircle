@@ -11,6 +11,14 @@
 
 ---
 
+## 🎥 Demo Video
+
+[![TrustCircle Demo Video](https://img.shields.io/badge/YouTube-Watch_Demo-red?logo=youtube&style=for-the-badge)](https://www.youtube.com/watch?v=placeholder)
+
+*(Replace `https://www.youtube.com/watch?v=placeholder` with the actual video link once uploaded)*
+
+---
+
 ## 📋 Table of Contents
 
 - [Project Overview](#project-overview)
@@ -150,6 +158,7 @@ TrustCircle now features a robust **Hybrid AI Architecture** allowing users to s
 - [x] **New:** Hybrid AI Architecture (Gemini Cloud + Zetic Melange On-Device)
 - [x] **New:** Privacy toggle to force local inference
 - [x] **New:** Offline Submission Caching (Auto-sync)
+- [x] **New:** UI/UX Polish (Responsive Graph Tabs, Professional Profile Settings)
 
 ---
 

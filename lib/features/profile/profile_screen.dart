@@ -192,6 +192,58 @@ class ProfileScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 16),
 
+                // Professional Settings card
+                Container(
+                  decoration: BoxDecoration(
+                    color: cardColor,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: borderColor),
+                  ),
+                  child: Column(
+                    children: [
+                      _SettingsTile(
+                        icon: Icons.person_outline_rounded,
+                        label: 'Account Settings',
+                        subtitle: 'Update profile and security',
+                        textColor: textColor,
+                        subColor: subColor,
+                        primary: primary,
+                        onTap: () {},
+                      ),
+                      Divider(color: borderColor, height: 1),
+                      _SettingsTile(
+                        icon: Icons.privacy_tip_outlined,
+                        label: 'Privacy & Security',
+                        subtitle: 'Manage your data',
+                        textColor: textColor,
+                        subColor: subColor,
+                        primary: primary,
+                        onTap: () {},
+                      ),
+                      Divider(color: borderColor, height: 1),
+                      _SettingsTile(
+                        icon: Icons.help_outline_rounded,
+                        label: 'Help & Support',
+                        subtitle: 'FAQ and contact',
+                        textColor: textColor,
+                        subColor: subColor,
+                        primary: primary,
+                        onTap: () {},
+                      ),
+                      Divider(color: borderColor, height: 1),
+                      _SettingsTile(
+                        icon: Icons.info_outline_rounded,
+                        label: 'About TrustCircle',
+                        subtitle: 'Terms and Privacy Policy',
+                        textColor: textColor,
+                        subColor: subColor,
+                        primary: primary,
+                        onTap: () {},
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
                 // Logout card
                 Container(
                   decoration: BoxDecoration(

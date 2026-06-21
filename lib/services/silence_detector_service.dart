@@ -47,15 +47,30 @@ class SilenceDetectorService {
           'name': name,
           'daysSilent': daysSilent,
         });
-
-        // Fire a push notification for this silent member
-        await notificationService.showSilenceAlert(name, daysSilent);
       }
     }
+
+    // Fire push notifications after gathering all silent members
+    if (silentMembers.isNotEmpty) {
+      if (silentMembers.length == 1) {
+        await notificationService.showSilenceAlert(
+            silentMembers.first['name'], silentMembers.first['daysSilent']);
+      } else {
+        await notificationService.showAggregatedSilenceAlert(
+            silentMembers.length, silentMembers.first['name']);
+      }
+    }
+
     return silentMembers;
   }
 }
 
 final silenceDetectorProvider = Provider<SilenceDetectorService>((ref) {
   return SilenceDetectorService(ref.read(firestoreServiceProvider));
+});
+
+final silentMembersProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
+  final circle = ref.watch(activeCircleProvider);
+  if (circle == null) return [];
+  return ref.read(silenceDetectorProvider).getSilentMembers(circle.id, circle.members);
 });

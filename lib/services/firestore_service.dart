@@ -119,6 +119,28 @@ class FirestoreService {
     return dates.first;
   }
 
+  Future<void> updateUserName(String uid, String newName) async {
+    await _db.collection(AppConstants.usersCollection).doc(uid).update({
+      'name': newName,
+    });
+  }
+
+  Future<void> leaveCircle(String circleId, String uid) async {
+    await _db.collection(AppConstants.circlesCollection).doc(circleId).update({
+      'members': FieldValue.arrayRemove([uid]),
+    });
+  }
+
+  Future<void> removeMember(String circleId, String memberUid) async {
+    await _db.collection(AppConstants.circlesCollection).doc(circleId).update({
+      'members': FieldValue.arrayRemove([memberUid]),
+    });
+  }
+
+  Future<void> deleteCircle(String circleId) async {
+    await _db.collection(AppConstants.circlesCollection).doc(circleId).delete();
+  }
+
   // ════════════════════════════════════════════════════════════════════════════
   // PULSES
   // ════════════════════════════════════════════════════════════════════════════

@@ -46,6 +46,14 @@ final circleTrustScoreProvider = Provider<double>((ref) {
   return total / pulses.length;
 });
 
+/// Fetches the trust score for a specific circle
+final specificCircleScoreProvider = FutureProvider.family<double, String>((ref, circleId) async {
+  final pulses = await ref.read(firestoreServiceProvider).getCirclePulses(circleId: circleId);
+  if (pulses.isEmpty) return 0.0;
+  final total = pulses.map((p) => p.trustScore).reduce((a, b) => a + b);
+  return total / pulses.length;
+});
+
 /// Computed average trust score for the current user (0-100)
 final individualTrustScoreProvider = Provider<double>((ref) {
   final pulses = ref.watch(weeklyPulsesProvider).asData?.value ?? [];

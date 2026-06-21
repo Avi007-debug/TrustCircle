@@ -88,7 +88,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           final m = members[index];
                           final name = m['name'] as String? ?? 'Anonymous';
                           final email = m['email'] as String? ?? '';
-                          final isCreator = m['uid'] == circle.createdBy;
+                          final uid = m['uid'] as String;
+                          final isCreator = uid == circle.createdBy;
+                          final currentUserIsAdmin = ref.read(currentUserProvider).asData?.value?.uid == circle.createdBy;
+                          final isMe = uid == ref.read(currentUserProvider).asData?.value?.uid;
                           
                           return ListTile(
                             leading: CircleAvatar(
@@ -109,6 +112,35 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               ],
                             ),
                             subtitle: Text(email, style: TextStyle(color: subColor, fontSize: 12)),
+                            trailing: (currentUserIsAdmin && !isMe)
+                                ? IconButton(
+                                    icon: const Icon(Icons.person_remove_rounded, color: AppColors.risk, size: 20),
+                                    onPressed: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (ctx) => AlertDialog(
+                                          backgroundColor: bgColor,
+                                          title: Text('Remove Member', style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
+                                          content: Text('Are you sure you want to remove $name from ${circle.name}?', style: TextStyle(color: subColor)),
+                                          actions: [
+                                            TextButton(onPressed: () => Navigator.pop(ctx), child: Text('Cancel', style: TextStyle(color: subColor))),
+                                            ElevatedButton(
+                                              style: ElevatedButton.styleFrom(backgroundColor: AppColors.risk, foregroundColor: Colors.white),
+                                              onPressed: () async {
+                                                await ref.read(firestoreServiceProvider).removeMember(circle.id, uid);
+                                                if (ctx.mounted) {
+                                                  Navigator.pop(ctx);
+                                                  Navigator.pop(sheetCtx);
+                                                }
+                                              },
+                                              child: const Text('Remove'),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  )
+                                : null,
                           );
                         },
                       );
@@ -833,11 +865,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ] else ...[
               ...circles.map((circle) => _CircleCard(
                     circle: circle,
+                    currentUid: userAsync.asData?.value?.uid ?? '',
                     isActive:
                         activeCircle?.id == circle.id,
-                    trustScore: trustScore,
-                    healthColor: healthColor,
-                    healthLabel: healthLabel,
                     isDark: isDark,
                     textColor: textColor,
                     subColor: subColor,
@@ -848,6 +878,48 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ref.read(activeCircleIdProvider.notifier).set(circle.id);
                     },
                     onViewMembers: () => _showMembersSheet(context, circle, isDark, bgColor, textColor, subColor, primary),
+                    onLeave: () {
+                      showDialog(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          backgroundColor: bgColor,
+                          title: Text('Leave Circle', style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
+                          content: Text('Are you sure you want to leave ${circle.name}?', style: TextStyle(color: subColor)),
+                          actions: [
+                            TextButton(onPressed: () => Navigator.pop(ctx), child: Text('Cancel', style: TextStyle(color: subColor))),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(backgroundColor: AppColors.risk, foregroundColor: Colors.white),
+                              onPressed: () async {
+                                await ref.read(firestoreServiceProvider).leaveCircle(circle.id, userAsync.asData!.value!.uid);
+                                if (ctx.mounted) Navigator.pop(ctx);
+                              },
+                              child: const Text('Leave'),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    onDelete: () {
+                      showDialog(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          backgroundColor: bgColor,
+                          title: Text('Delete Circle', style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
+                          content: Text('Are you sure you want to permanently delete ${circle.name}?', style: TextStyle(color: subColor)),
+                          actions: [
+                            TextButton(onPressed: () => Navigator.pop(ctx), child: Text('Cancel', style: TextStyle(color: subColor))),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(backgroundColor: AppColors.risk, foregroundColor: Colors.white),
+                              onPressed: () async {
+                                await ref.read(firestoreServiceProvider).deleteCircle(circle.id);
+                                if (ctx.mounted) Navigator.pop(ctx);
+                              },
+                              child: const Text('Delete'),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                   )),
             ],
 
@@ -1082,12 +1154,10 @@ class _MiniStat extends StatelessWidget {
   }
 }
 
-class _CircleCard extends StatelessWidget {
+class _CircleCard extends ConsumerWidget {
   final CircleModel circle;
+  final String currentUid;
   final bool isActive;
-  final double trustScore;
-  final Color healthColor;
-  final String healthLabel;
   final bool isDark;
   final Color textColor;
   final Color subColor;
@@ -1096,13 +1166,13 @@ class _CircleCard extends StatelessWidget {
   final Color primary;
   final VoidCallback onTap;
   final VoidCallback onViewMembers;
+  final VoidCallback onLeave;
+  final VoidCallback onDelete;
 
   const _CircleCard({
     required this.circle,
+    required this.currentUid,
     required this.isActive,
-    required this.trustScore,
-    required this.healthColor,
-    required this.healthLabel,
     required this.isDark,
     required this.textColor,
     required this.subColor,
@@ -1111,10 +1181,23 @@ class _CircleCard extends StatelessWidget {
     required this.primary,
     required this.onTap,
     required this.onViewMembers,
+    required this.onLeave,
+    required this.onDelete,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final scoreAsync = ref.watch(specificCircleScoreProvider(circle.id));
+    final score = scoreAsync.asData?.value ?? 0.0;
+    final hasData = scoreAsync.hasValue && score > 0;
+    
+    final healthColor = score >= 70
+        ? AppColors.healthy
+        : (score >= 40 ? AppColors.watch : AppColors.risk);
+    final healthLabel = score >= 70
+        ? 'Healthy'
+        : (score >= 40 ? 'Needs Attention' : 'At Risk');
+
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -1164,11 +1247,14 @@ class _CircleCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Text(circle.name,
-                          style: TextStyle(
-                              color: textColor,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15)),
+                      Flexible(
+                        child: Text(circle.name,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                                color: textColor,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15)),
+                      ),
                       if (isActive) ...[
                         const SizedBox(width: 6),
                         Container(
@@ -1255,18 +1341,62 @@ class _CircleCard extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text(
-                  isActive ? '${trustScore.toInt()}%' : '--',
-                  style: TextStyle(
-                      color: isActive ? healthColor : subColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      hasData ? '${score.toInt()}%' : '--',
+                      style: TextStyle(
+                          color: hasData ? healthColor : subColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18),
+                    ),
+                    const SizedBox(width: 4),
+                    PopupMenuButton<String>(
+                      icon: Icon(Icons.more_vert, color: subColor, size: 20),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      color: cardColor,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      onSelected: (value) {
+                        if (value == 'leave') onLeave();
+                        if (value == 'delete') onDelete();
+                      },
+                      itemBuilder: (BuildContext context) => [
+                        if (circle.createdBy != currentUid)
+                          const PopupMenuItem(
+                            value: 'leave',
+                            child: Row(
+                              children: [
+                                Icon(Icons.exit_to_app_rounded, color: AppColors.risk, size: 18),
+                                SizedBox(width: 8),
+                                Text('Leave Circle', style: TextStyle(color: AppColors.risk)),
+                              ],
+                            ),
+                          ),
+                        if (circle.createdBy == currentUid)
+                          const PopupMenuItem(
+                            value: 'delete',
+                            child: Row(
+                              children: [
+                                Icon(Icons.delete_outline_rounded, color: AppColors.risk, size: 18),
+                                SizedBox(width: 8),
+                                Text('Delete Circle', style: TextStyle(color: AppColors.risk)),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+                  ],
                 ),
-                Text(
-                  isActive ? healthLabel : 'Select',
-                  style: TextStyle(
-                      color: isActive ? healthColor : subColor,
-                      fontSize: 11),
+                Padding(
+                  padding: const EdgeInsets.only(right: 28), // align under the percentage
+                  child: Text(
+                    hasData ? healthLabel : 'Select',
+                    style: TextStyle(
+                        color: hasData ? healthColor : subColor,
+                        fontSize: 11),
+                  ),
                 ),
               ],
             ),

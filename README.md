@@ -1,13 +1,19 @@
-# TrustCircle
+# TrustCircle 
 
 > **AI-Powered Relationship Health & Trust Management App**
-> 
-> Built by **Zombie Heart** Team
+>
+> *An intelligent companion for building and maintaining strong relationships*
+
+<div align="center">
 
 [![GitHub Repository](https://img.shields.io/badge/GitHub-TrustCircle-blue?logo=github)](https://github.com/Avi007-debug/TrustCircle)
 [![Flutter](https://img.shields.io/badge/Flutter-3.29.2-blue?logo=flutter)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/Dart-3.7.2-blue?logo=dart)](https://dart.dev)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
+
+**Built by [Zombie Heart Team](https://github.com/Avi007-debug) | Hackathon Ready 🚀**
+
+</div>
 
 ---
 
@@ -15,21 +21,19 @@
 
 [![TrustCircle Demo Video](https://img.shields.io/badge/YouTube-Watch_Demo-red?logo=youtube&style=for-the-badge)](https://www.youtube.com/watch?v=placeholder)
 
-*(Replace `https://www.youtube.com/watch?v=placeholder` with the actual video link once uploaded)*
+<sub>*Replace link with actual video once uploaded*</sub>
 
 ---
 
-## 📋 Table of Contents
+## 📋 Quick Navigation
 
-- [Project Overview](#project-overview)
-- [Team](#team)
-- [Tech Stack](#tech-stack)
-- [Current Status](#current-status)
-- [Implemented Features](#implemented-features)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-- [Development](#development)
-- [Contributing](#contributing)
+- [Overview](#-project-overview)
+- [Features](#-core-features) 
+- [AI Architecture](#-hybrid-ai-architecture)
+- [Tech Stack](#-tech-stack)
+- [Project Structure](#-project-structure)
+- [Setup Guide](#-getting-started)
+- [Contributing](#-contributing)
 
 ---
 
@@ -37,128 +41,129 @@
 
 **TrustCircle** is an AI-powered mobile application designed to help users manage and strengthen their relationships through daily check-ins, trust scoring, and AI-driven insights. The app leverages advanced AI models and voice technology to provide meaningful relationship health metrics and personalized recommendations.
 
-### Key Features (Implemented)
-- 🔐 Secure authentication with Firebase
-- 💬 Daily pulse check-ins and gratitude tracking
-- 🤖 AI-powered insights using Gemini and local Melange models
-- 🎤 Voice check-in support using Speech-to-Text
-- 📊 Trust score calculation and dashboard
-- 👥 Circle management (create & join groups)
-- 🔔 Smart local push notifications (WhatsApp-style)
-- 🤫 Silence detection for inactive users
-- 🤝 Resolve Mode with AI conflict resolution guides
-- 🚀 **New:** Beautiful 5-page first-time user onboarding walkthrough
+### ✨ Why TrustCircle?
+
+- **Real-Time Relationship Monitoring** – Daily pulse check-ins measure relationship health
+- **AI-Powered Intelligence** – Hybrid cloud & on-device AI for insights and guidance
+- **Privacy First** – Local AI option keeps your emotional data on your device
+- **Proactive Support** – Automatic detection of relationship struggles
+- **Voice-First Design** – Speak your feelings, AI understands your emotions
 
 ---
 
-## ✨ Feature Deep-Dive
+## 🚀 Core Features
 
-### 1. 🚨 Silence Detector (Proactive Support)
-- Automatically monitors user activity within circles.
-- Triggers a **Silence Alert** if a user hasn't checked in for 3+ days.
-- **Circle-Aware UI:** 
-  - **Family Circles:** Displays a large, urgent banner urging members to reach out.
-  - **Other Circles:** Displays a subtle, compact bubble notification.
-- **Smart Copy:** Identifies if the current user is the silent one and dynamically changes the copy to encourage them to check in (e.g., "You — 4 days silent. Your family is waiting to hear from you.").
+### 🎤 Voice Check-In with AI Interpretation
+Speak naturally about your feelings. TrustCircle's AI automatically interprets your emotions and sets your relationship metrics (Heard, Respected, Safe, Connected).
 
-### 2. 🎤 AI Voice Check-In
-- Users can tap the microphone to simply speak their feelings.
-- The app uses Natural Language Processing to automatically interpret their emotions and set the "Heard/Respected/Safe/Connected" sliders for them.
+### 🎨 Beautiful Onboarding Walkthrough
+New users are guided through a stunning 5-page onboarding experience designed to explain core concepts and get them started in minutes.
 
-### 3. 🤝 Resolve Mode
-- Automatically triggers when a circle's overall Trust Score drops below **50%**.
-- Generates an **AI Conflict Resolution Guide** using the Gemini API, specifically tailored to the circle's current trust data.
-- Guides are formatted beautifully in Markdown, providing actionable advice to repair the relationship.
+### 📊 Trust Score Dashboard
+Real-time visualization of relationship health across all your circles with interactive charts and historical trends.
 
-### 4. 🔔 Smart Notification System
-- **Hourly Nudges:** Reminds users to submit their daily pulse starting at a configured time, repeating hourly. Auto-cancels the moment a pulse is submitted.
-- **Push Alerts:** Sends immediate system notifications for Silence Alerts and Resolve Mode triggers.
+### 👥 Circle Management
+Create and join groups, invite loved ones, and monitor the collective health of your relationships.
+
+### 🤖 AI-Powered Insights
+- **Cloud AI (Gemini):** Advanced natural language understanding and recommendations
+- **Local AI (Zetic MLange):** Private on-device inference with TinyLlama & Whisper
+
+### 🨤 Silence Detector
+Automatically alerts you when loved ones haven't checked in for 3+ days:
+- **Family Circles:** Large, urgent banners to encourage outreach
+- **Other Circles:** Subtle notifications for gentle reminders
+- **Smart Detection:** Identifies if YOU're the silent one and adjusts messaging
+
+### 🤝 Resolve Mode
+When a circle's trust score drops below 50%, AI automatically generates a **Conflict Resolution Guide** with actionable advice to repair relationships.
+
+### 🔔 Smart Notification System
+- **Hourly Nudges:** Reminder to submit daily pulse (auto-cancels when submitted)
+- **Immediate Alerts:** Push notifications for Silence Alerts and Resolve Mode triggers
+
+### 💬 Gratitude Tracking
+Capture moments of connection and appreciation with your circles.
+
+### 🔐 Secure Authentication
+Firebase-backed authentication with Google Sign-In support.
 
 ---
 
-## 🤖 Hybrid AI Architecture (Cloud + On-Device)
+## 🤖 Hybrid AI Architecture
 
-TrustCircle now features a robust **Hybrid AI Architecture** allowing users to seamlessly transition between Cloud AI (Gemini) and On-Device AI (Zetic MLange + TinyLlama + Whisper).
+TrustCircle features a powerful **dual AI system** for maximum flexibility:
 
-### 1. Zetic MLange On-Device Integration
-- **True Offline Inference:** Integrated `zetic_mlange` to download and run the `meta/TinyLlama-1.1B-Chat-v1.0` and `OpenAI/whisper-tiny-decoder` models natively on the user's Android hardware.
-- **Privacy First:** Users can explicitly toggle **"Use On-Device AI for Privacy"** in the UI. When enabled, their voice transcriptions are processed 100% locally by TinyLlama, guaranteeing their emotional data never leaves the phone for analysis.
-- **Offline Fallback:** If the user loses internet connection, the `AiRouterService` automatically intercepts the voice check-in and routes it to the local Melange models.
+### Cloud AI (Gemini)
+- Advanced language understanding and conflict resolution guides
+- Requires internet connectivity
+- Ideal for complex emotional analysis
 
-### 2. Smart Submission Syncing
-- While the AI grading can happen completely offline for privacy or connectivity reasons, submitting the pulse to the circle still requires an internet connection (Firestore).
-- **Offline Caching:** If a user submits a pulse while offline, TrustCircle saves it locally to the device and displays a notification. The pulse is then automatically synced to the cloud the moment the device regains connectivity.
+### On-Device AI (Zetic MLange)
+- **True Offline Capability:** Run models locally on your Android device
+- **100% Privacy:** Your emotional data never leaves your phone
+- **Models Included:**
+  - `meta/TinyLlama-1.1B-Chat-v1.0` – Text analysis
+  - `OpenAI/whisper-tiny-decoder` – Voice transcription
+- **Privacy Toggle:** Users can explicitly enable "Use On-Device AI for Privacy"
+- **Automatic Fallback:** Switches to local AI when internet is unavailable
+
+### Smart Syncing
+- Voice analysis happens offline when configured
+- Pulse submissions sync to Firestore automatically when reconnected
+- Offline pulse submissions are cached and synced on connectivity
 
 ---
 
 ## 👥 Team
 
-### Organization
-**Team Name:** Zombie Heart
-
-**GitHub Organization:** [Avi007-debug](https://github.com/Avi007-debug)
-
-### Contributor
-**Name:** Avishkar More
-**Role:** Sole Developer (Frontend, Backend, AI Integration, UI/UX Architecture)
+| Role | Developer |
+|------|-----------|
+| **Organization** | Zombie Heart |
+| **Lead Developer** | Avishkar More |
+| **Contributions** | Frontend, Backend, AI Integration, UI/UX |
 
 ---
 
 ## 🛠️ Tech Stack
 
-### Frontend
-- **Framework:** Flutter 3.29.2 (Stable)
-- **Language:** Dart 3.7.2
-- **State Management:** Riverpod
-- **Navigation:** GoRouter
-- **UI Components:** Flutter Material
-- **Fonts:** Google Fonts
-- **Assets:** Flutter SVG
+### 📱 Frontend
+| Component | Technology |
+|-----------|-----------|
+| Framework | Flutter 3.29.2 |
+| Language | Dart 3.7.2 |
+| State Management | Riverpod |
+| Navigation | GoRouter |
+| UI Framework | Material Design |
+| Typography | Google Fonts |
+| Vector Graphics | Flutter SVG |
 
-### Backend & Services
-- **Backend:** Firebase
-- **Database:** Firestore
-- **Authentication:** Firebase Auth
-- **Messaging:** Local Push Notifications (`flutter_local_notifications`)
+### ☁️ Backend & Services
+| Service | Technology |
+|---------|-----------|
+| Backend | Firebase |
+| Database | Firestore |
+| Authentication | Firebase Auth + Google Sign-In |
+| Push Notifications | flutter_local_notifications |
 
-### AI & Voice
-- **AI Model:** Google Gemini API
-- **On-Device AI:** Zetic MLange (TinyLlama & Whisper) + Offline Heuristic
-- **Audio Processing:** Speech-to-Text
+### 🤖 AI & Voice
+| Component | Technology |
+|-----------|-----------|
+| Cloud AI | Google Gemini API |
+| On-Device AI | Zetic MLange (TinyLlama, Whisper) |
+| Voice Recognition | Speech-to-Text |
 
-### Development & Testing
-- **IDE:** Android Studio 2024.3
-- **Test Device:** OPPO CPH2381 (Android 14, API 34)
+### 🔧 Development
+| Tool | Version |
+|------|---------|
+| IDE | Android Studio 2024.3 |
+| Test Device | OPPO CPH2381 (Android 14, API 34) |
 
----
-
-## 📱 Android Configuration
-
-| Setting | Value |
-|---------|-------|
-| **Package Name** | com.zombieheart.trustcircle |
-| **App Name** | TrustCircle |
-| **Target SDK** | Latest available |
-
----
-
-## ✅ Current Status
-
-**Status:** Hackathon Ready 🚀
-
-### Completed ✨
-- [x] Flutter environment setup & verification
-- [x] Package name configuration (`com.zombieheart.trustcircle`)
-- [x] Authentication and Firebase setup
-- [x] Circle creation and management logic
-- [x] Daily trust pulse check-ins with sliders
-- [x] **New:** Voice Check-In (transcribes speech to auto-set sliders)
-- [x] **New:** Silence Detector (banners when members are inactive)
-- [x] **New:** Resolve Mode (auto-triggers below 50% trust with Gemini advice)
-- [x] **New:** Hybrid AI Architecture (Gemini Cloud + Zetic Melange On-Device)
-- [x] **New:** Privacy toggle to force local inference
-- [x] **New:** Offline Submission Caching (Auto-sync)
-- [x] **New:** UI/UX Polish (Responsive Graph Tabs, Professional Profile Settings)
+### 📦 Android Configuration
+- **Package Name:** `com.zombieheart.trustcircle`
+- **App Name:** TrustCircle
+- **Target SDK:** Latest available
+- **Min SDK:** API 21
 
 ---
 
@@ -166,39 +171,82 @@ TrustCircle now features a robust **Hybrid AI Architecture** allowing users to s
 
 ```
 lib/
-├── main.dart                    # App entry point
+├── main.dart                    # Application entry point
+│
 ├── core/
-│   ├── constants/              # App-wide constants
-│   ├── theme/                  # Theme configuration
-│   └── utils/                  # Utility functions
+│   ├── constants/              # App-wide constants and configurations
+│   ├── theme/                  # Theme and styling
+│   └── utils/                  # Utility functions and helpers
+│
 ├── data/
-│   ├── models/                 # Data models
-│   └── repositories/           # Data repositories
+│   ├── models/                 # Data models and entities
+│   └── repositories/           # Data access layer
+│
 ├── features/
 │   ├── splash/                 # Splash screen
-│   ├── auth/                   # Authentication
-│   ├── home/                   # Home dashboard
-│   ├── checkin/                # Check-in and Voice features
+│   ├── auth/                   # Authentication flows
+│   ├── onboarding/             # First-time user walkthrough (5 pages)
+│   ├── home/                   # Dashboard and home screen
+│   ├── circles/                # Circle management
+│   ├── checkin/                # Daily pulse check-ins
+│   ├── voice/                  # Voice check-in support
 │   ├── gratitude/              # Gratitude tracking
-│   ├── insights/               # AI insights
-│   ├── resolve/                # Resolve Mode screens
-│   └── profile/                # User profile
-├── providers/                  # Riverpod providers
-├── routes/                     # Navigation routing
-├── services/                   # Business logic (Gemini, Silence, Local AI)
-└── widgets/                    # Reusable widgets
+│   ├── insights/               # AI-powered insights
+│   ├── resolve/                # Resolve Mode (conflict resolution)
+│   └── profile/                # User profile and settings
+│
+├── providers/                  # Riverpod state providers
+├── routes/                     # GoRouter navigation configuration
+│
+├── services/                   # Business logic & integrations
+│   ├── ai_router_service.dart         # Cloud/Local AI routing
+│   ├── gemini_service.dart            # Gemini API integration
+│   ├── local_ai_service.dart          # On-device ML inference
+│   ├── voice_service.dart             # Voice transcription
+│   ├── silence_detector_service.dart  # Inactivity detection
+│   ├── notification_service.dart      # Push notifications
+│   ├── auth_service.dart              # Firebase authentication
+│   └── firestore_service.dart         # Firestore data operations
+│
+└── widgets/                    # Reusable UI components
 ```
+
+---
+
+## ✅ Status
+
+**Current Status:** Hackathon Ready 🚀
+
+### Completed Features ✨
+- [x] Flutter environment and package configuration
+- [x] Firebase authentication with Google Sign-In
+- [x] Circle creation, joining, and management
+- [x] Daily trust pulse check-ins with interactive sliders
+- [x] Voice-to-text check-in with auto-slider interpretation
+- [x] Silence detection with adaptive UI notifications
+- [x] Resolve Mode with AI-powered conflict resolution guides
+- [x] Hybrid AI architecture (Cloud + On-Device)
+- [x] Privacy-focused on-device AI option
+- [x] Offline pulse submission caching with auto-sync
+- [x] Beautiful 5-page onboarding walkthrough
+- [x] Responsive dashboard with charts and analytics
+- [x] Professional UI/UX polish
 
 ---
 
 ## 🚀 Getting Started
 
 ### Prerequisites
-- **Flutter:** 3.29.2 (Stable)
-- **Dart:** 3.7.2
-- **Android Studio:** 2024.3 or later
+Before you begin, ensure you have the following installed:
 
-### Installation
+```
+✓ Flutter 3.29.2 (Stable Channel)
+✓ Dart 3.7.2
+✓ Android Studio 2024.3 or later
+✓ Git
+```
+
+### Quick Setup
 
 1. **Clone the repository**
    ```bash
@@ -211,37 +259,85 @@ lib/
    flutter pub get
    ```
 
-3. **Run the app**
+3. **Configure Firebase** (if needed)
+   - Update `lib/firebase_options.dart` with your Firebase credentials
+   - Ensure `.env` file is properly configured
+
+4. **Run the application**
    ```bash
    flutter run
    ```
+
+### Optional: Configure Environment Variables
+Create a `.env` file in the project root with your API keys:
+```env
+GEMINI_API_KEY=your_gemini_api_key_here
+```
+
+---
+
+## 👨‍💻 Development
+
+### Code Style & Standards
+- Follow Dart formatting with `dart format`
+- Use meaningful variable and function names
+- Write concise comments for complex logic
+- Keep UI components modular and reusable
+
+### Branch Naming Convention
+- Feature branches: `feature/your-feature-name`
+- Bug fixes: `bugfix/issue-description`
+- Hotfixes: `hotfix/critical-issue`
+
+### Making Changes
+1. Create a feature branch from `develop`
+2. Make your changes with clear, atomic commits
+3. Ensure the app builds without errors: `flutter build apk`
+4. Push to your branch and create a Pull Request
+5. Request reviews before merging
 
 ---
 
 ## 🤝 Contributing
 
-### Getting Started with Development
-1. Create a new feature branch: `git checkout -b feature/your-feature-name`
-2. Make your changes
-3. Commit with clear messages: `git commit -m "Add your feature description"`
-4. Push to your branch: `git push origin feature/your-feature-name`
-5. Create a Pull Request to `develop` branch
+We welcome contributions! Here's how to get involved:
+
+1. **Fork** the repository
+2. **Create** a feature branch: `git checkout -b feature/your-feature`
+3. **Commit** with clear messages: `git commit -m "Add feature description"`
+4. **Push** to your branch: `git push origin feature/your-feature`
+5. **Create** a Pull Request to the `develop` branch
+
+Please ensure your code:
+- Follows the project's code style
+- Includes relevant comments
+- Doesn't break existing functionality
+- Is tested on a physical or emulated device
 
 ---
 
-## 📜 License
+## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for full details.
+
+---
+
+## 📞 Contact & Support
+
+For questions or support:
+- **Organization:** [Zombie Heart on GitHub](https://github.com/Avi007-debug)
+- **Lead Developer:** Avishkar More
+- **Repository:** [TrustCircle GitHub](https://github.com/Avi007-debug/TrustCircle)
 
 ---
 
-## 👨‍💻 Contributor
+<div align="center">
 
-**Zombie Heart**
-
-- Avishkar More (Sole Developer)
-
----
+### Made with ❤️ by Zombie Heart Team
 
 **Last Updated:** June 21, 2026  
 **Status:** Hackathon Build Complete ✅
+
+[⬆ Back to top](#trustcircle-💙)
+
+</div>

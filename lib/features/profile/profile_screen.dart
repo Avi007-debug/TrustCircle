@@ -6,6 +6,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/circle_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../providers/notification_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -206,6 +207,10 @@ class ProfileScreen extends ConsumerWidget {
                     subColor: subColor,
                     primary: AppColors.risk,
                     onTap: () async {
+                      // Clear onboarding preference so new accounts see the walkthrough during demos
+                      final prefs = await SharedPreferences.getInstance();
+                      await prefs.remove('onboarding_complete');
+                      
                       await ref.read(authServiceProvider).signOut();
                       if (context.mounted) context.go('/login');
                     },

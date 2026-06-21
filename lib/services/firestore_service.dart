@@ -4,6 +4,7 @@ import '../data/models/circle_model.dart';
 import '../data/models/pulse_model.dart';
 import '../data/models/gratitude_model.dart';
 import '../data/models/insight_model.dart';
+import '../data/models/user_model.dart';
 import '../core/constants/app_constants.dart';
 
 class FirestoreService {
@@ -96,23 +97,25 @@ class FirestoreService {
     return users;
   }
 
-  Future<dynamic> getUser(String uid) async {
+  Future<UserModel?> getUser(String uid) async {
     final snap = await _db.collection(AppConstants.usersCollection).doc(uid).get();
-    if (!snap.exists) return null;
-    return snap.data(); // Needs to be parsed into user model if exists, assuming returning map or simple object
+    if (!snap.exists || snap.data() == null) return null;
+    return UserModel.fromMap(snap.data()!);
   }
 
   Future<DateTime?> getLastActivityDate(String uid) async {
     final snap = await _db
         .collection(AppConstants.pulsesCollection)
         .where('userId', isEqualTo: uid)
-        .orderBy('timestamp', descending: true)
-        .limit(1)
         .get();
-    if (snap.docs.isNotEmpty) {
-      return (snap.docs.first.data()['timestamp'] as Timestamp).toDate();
-    }
-    return null;
+    
+    if (snap.docs.isEmpty) return null;
+    
+    final dates = snap.docs
+        .map((doc) => (doc.data()['timestamp'] as Timestamp).toDate())
+        .toList();
+    dates.sort((a, b) => b.compareTo(a));
+    return dates.first;
   }
 
   // ════════════════════════════════════════════════════════════════════════════

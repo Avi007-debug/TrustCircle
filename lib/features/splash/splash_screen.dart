@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/auth_provider.dart';
 import '../../core/theme/app_theme.dart';
 
@@ -43,9 +44,17 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   void _navigate(bool isLoggedIn) {
     if (_navigated || !mounted) return;
     _navigated = true;
-    Future.delayed(const Duration(milliseconds: 2600), () {
-      if (mounted) {
-        context.go(isLoggedIn ? '/home' : '/login');
+    Future.delayed(const Duration(milliseconds: 2600), () async {
+      if (!mounted) return;
+      final prefs = await SharedPreferences.getInstance();
+      final onboardingComplete = prefs.getBool('onboarding_complete') ?? false;
+
+      if (!onboardingComplete) {
+        context.go('/onboarding');
+      } else if (isLoggedIn) {
+        context.go('/home');
+      } else {
+        context.go('/login');
       }
     });
   }

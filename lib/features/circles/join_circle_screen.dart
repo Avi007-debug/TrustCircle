@@ -80,7 +80,7 @@ class _JoinCircleScreenState extends ConsumerState<JoinCircleScreen> {
             style:
                 TextStyle(color: textColor, fontWeight: FontWeight.bold)),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -91,8 +91,8 @@ class _JoinCircleScreenState extends ConsumerState<JoinCircleScreen> {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    primary.withOpacity(0.15),
-                    primary.withOpacity(0.05)
+                    primary.withValues(alpha: 0.15),
+                    primary.withValues(alpha: 0.05)
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -138,10 +138,10 @@ class _JoinCircleScreenState extends ConsumerState<JoinCircleScreen> {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: AppColors.risk.withOpacity(0.1),
+                        color: AppColors.risk.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(10),
                         border:
-                            Border.all(color: AppColors.risk.withOpacity(0.3)),
+                            Border.all(color: AppColors.risk.withValues(alpha: 0.3)),
                       ),
                       child: Row(
                         children: [
@@ -172,7 +172,7 @@ class _JoinCircleScreenState extends ConsumerState<JoinCircleScreen> {
                     decoration: InputDecoration(
                       hintText: 'ABC123',
                       hintStyle: TextStyle(
-                          color: subColor.withOpacity(0.4),
+                          color: subColor.withValues(alpha: 0.4),
                           fontSize: 28,
                           letterSpacing: 8),
                       counterText: '',

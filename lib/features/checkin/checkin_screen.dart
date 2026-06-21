@@ -8,6 +8,7 @@ import '../../providers/circle_provider.dart';
 import '../../providers/pulse_provider.dart';
 import '../../services/voice_service.dart';
 import '../../services/gemini_service.dart';
+import '../../services/notification_service.dart';
 
 class CheckinScreen extends ConsumerStatefulWidget {
   const CheckinScreen({super.key});
@@ -87,6 +88,9 @@ class _CheckinScreenState extends ConsumerState<CheckinScreen>
       ref.invalidate(hasPulsedTodayProvider);
       ref.invalidate(weeklyPulsesProvider);
       ref.invalidate(circlePulsesProvider);
+
+      // Cancel hourly nudge notifications since pulse was submitted
+      await notificationService.cancelHourlyNudges();
 
       setState(() => _showSuccess = true);
       _successController.forward();

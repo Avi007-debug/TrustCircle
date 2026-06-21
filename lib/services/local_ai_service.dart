@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 
 /// LocalAiService mimics the on-device AI functionality provided by Melange.
 /// In a full production environment, this would load a .tflite model

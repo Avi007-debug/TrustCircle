@@ -27,11 +27,11 @@ class VoiceService {
       onResult: (result) {
         onResult(result.recognizedWords);
       },
-      listenFor: const Duration(minutes: 5),
-      pauseFor: const Duration(seconds: 5),
-      partialResults: true,
-      cancelOnError: true,
-      listenMode: ListenMode.dictation,
+      listenOptions: SpeechListenOptions(
+        listenMode: ListenMode.dictation,
+        cancelOnError: true,
+        partialResults: true,
+      ),
     );
   }
 

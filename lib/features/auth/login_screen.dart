@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/theme/app_theme.dart';
 import '../../providers/auth_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -34,7 +35,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             email: _emailController.text.trim(),
             password: _passwordController.text,
           );
-      if (mounted) context.go('/home');
+      if (mounted) {
+        final prefs = await SharedPreferences.getInstance();
+        final onboardingComplete = prefs.getBool('onboarding_complete') ?? false;
+        if (!onboardingComplete) {
+          context.go('/onboarding');
+        } else {
+          context.go('/home');
+        }
+      }
     } catch (e) {
       setState(() { _errorMessage = _friendlyError(e.toString()); });
     } finally {
@@ -46,7 +55,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     setState(() { _isLoading = true; _errorMessage = null; });
     try {
       final user = await ref.read(authServiceProvider).signInWithGoogle();
-      if (user != null && mounted) context.go('/home');
+      if (user != null && mounted) {
+        final prefs = await SharedPreferences.getInstance();
+        final onboardingComplete = prefs.getBool('onboarding_complete') ?? false;
+        if (!onboardingComplete) {
+          context.go('/onboarding');
+        } else {
+          context.go('/home');
+        }
+      }
     } catch (e) {
       setState(() { _errorMessage = _friendlyError(e.toString()); });
     } finally {

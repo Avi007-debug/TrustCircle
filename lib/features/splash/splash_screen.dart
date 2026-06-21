@@ -63,7 +63,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   Widget build(BuildContext context) {
     final authState = ref.watch(authStateProvider);
 
-    authState.whenData((user) => _navigate(user != null));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      authState.whenData((user) => _navigate(user != null));
+    });
 
     return Scaffold(
       body: Container(

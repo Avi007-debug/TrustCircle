@@ -1,0 +1,43 @@
+name: zetic_mlange
+description: Flutter FFI SDK for running ZeticMLange on-device AI models on Android and iOS.
+version: 1.8.1
+homepage: https://docs.zetic.ai
+repository: https://github.com/zetic-ai/ZeticMLangeFlutter
+issue_tracker: https://github.com/zetic-ai/ZeticMLangeFlutter
+topics:
+  - on-device-ai
+  - ffi
+  - machine-learning
+  - npu
+  - zetic
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: '>=3.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  ffi: ^2.1.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        package: com.zeticai.mlange.flutter
+        pluginClass: MlangeFlutterPlugin
+      ios:
+        pluginClass: MlangeFlutterPlugin
+
+platforms:
+  android:
+  ios:

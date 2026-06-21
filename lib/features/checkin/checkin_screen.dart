@@ -7,7 +7,9 @@ import '../../providers/auth_provider.dart';
 import '../../providers/circle_provider.dart';
 import '../../providers/pulse_provider.dart';
 import '../../services/voice_service.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import '../../services/gemini_service.dart';
+import '../../services/ai_router_service.dart';
 import '../../services/notification_service.dart';
 
 class CheckinScreen extends ConsumerStatefulWidget {
@@ -26,6 +28,7 @@ class _CheckinScreenState extends ConsumerState<CheckinScreen>
     'connected': 5.0,
   };
   bool _isSubmitting = false;
+  bool _useLocalAi = false;
   late AnimationController _successController;
   late Animation<double> _successAnimation;
   bool _showSuccess = false;
@@ -91,6 +94,15 @@ class _CheckinScreenState extends ConsumerState<CheckinScreen>
 
       // Cancel hourly nudge notifications since pulse was submitted
       await notificationService.cancelHourlyNudges();
+      
+      final List<ConnectivityResult> connectivityResult = await Connectivity().checkConnectivity();
+      final bool isOnline = !connectivityResult.contains(ConnectivityResult.none) && connectivityResult.isNotEmpty;
+      
+      if (!isOnline && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Saved locally. Your pulse will sync automatically when back online!')),
+        );
+      }
 
       setState(() => _showSuccess = true);
       _successController.forward();
@@ -115,7 +127,7 @@ class _CheckinScreenState extends ConsumerState<CheckinScreen>
       if (_voiceTranscript.isNotEmpty) {
         setState(() => _isSubmitting = true);
         try {
-          final result = await ref.read(geminiServiceProvider).analyzeVoiceJournal(_voiceTranscript);
+          final result = await ref.read(aiRouterServiceProvider).analyzeVoiceJournal(_voiceTranscript, forceLocal: _useLocalAi);
           setState(() {
             _values['heard'] = result['heard'] ?? 5.0;
             _values['respected'] = result['respected'] ?? 5.0;
@@ -341,6 +353,15 @@ class _CheckinScreenState extends ConsumerState<CheckinScreen>
                      ),
                    ),
                 ],
+                const SizedBox(height: 12),
+                SwitchListTile(
+                  title: Text('Use On-Device AI (TinyLlama) for Privacy', style: TextStyle(color: textColor, fontWeight: FontWeight.w600, fontSize: 14)),
+                  subtitle: Text('Analyzes locally without sending audio text to the cloud', style: TextStyle(color: subColor, fontSize: 12)),
+                  value: _useLocalAi,
+                  activeColor: primary,
+                  contentPadding: EdgeInsets.zero,
+                  onChanged: (val) => setState(() => _useLocalAi = val),
+                ),
                 const SizedBox(height: 24),
 
                 // Sliders

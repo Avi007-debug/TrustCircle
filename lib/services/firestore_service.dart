@@ -4,6 +4,7 @@ import '../data/models/circle_model.dart';
 import '../data/models/pulse_model.dart';
 import '../data/models/gratitude_model.dart';
 import '../data/models/insight_model.dart';
+import '../data/models/user_model.dart';
 import '../core/constants/app_constants.dart';
 
 class FirestoreService {
@@ -94,6 +95,27 @@ class FirestoreService {
       users.addAll(snap.docs.map((d) => d.data()));
     }
     return users;
+  }
+
+  Future<UserModel?> getUser(String uid) async {
+    final snap = await _db.collection(AppConstants.usersCollection).doc(uid).get();
+    if (!snap.exists || snap.data() == null) return null;
+    return UserModel.fromMap(snap.data()!);
+  }
+
+  Future<DateTime?> getLastActivityDate(String uid) async {
+    final snap = await _db
+        .collection(AppConstants.pulsesCollection)
+        .where('userId', isEqualTo: uid)
+        .get();
+    
+    if (snap.docs.isEmpty) return null;
+    
+    final dates = snap.docs
+        .map((doc) => (doc.data()['timestamp'] as Timestamp).toDate())
+        .toList();
+    dates.sort((a, b) => b.compareTo(a));
+    return dates.first;
   }
 
   // ════════════════════════════════════════════════════════════════════════════

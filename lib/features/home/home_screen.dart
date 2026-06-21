@@ -11,6 +11,9 @@ import '../../providers/auth_provider.dart';
 import '../../providers/circle_provider.dart';
 import '../../providers/pulse_provider.dart';
 import '../../providers/gratitude_provider.dart';
+import '../../services/silence_detector_service.dart';
+import '../../services/gemini_service.dart';
+import '../../services/notification_service.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -137,6 +140,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final healthLabel = _trustHealthLabel(trustScore);
     final healthColor = _trustHealthColor(trustScore);
 
+    final circlePulsesAsync = ref.watch(circlePulsesProvider);
+
+    // Auto-fire resolve notification when trust score is low
+    if (!circlePulsesAsync.isLoading && circlePulsesAsync.hasValue && circlePulsesAsync.value!.isNotEmpty) {
+      if (trustScore < AppConstants.watchThreshold && activeCircle != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          notificationService.showResolveNotification(activeCircle.name, trustScore);
+        });
+      }
+    }
+
     // Build trend icon & label
     IconData trendIcon;
     Color trendColor;
@@ -212,6 +226,174 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               style: TextStyle(color: subColor, fontSize: 14),
             ),
             const SizedBox(height: 24),
+
+            // ── Silence Detector ────────────────────────────────────────────
+            if (activeCircle != null)
+              FutureBuilder<List<Map<String, dynamic>>>(
+                future: ref.read(silenceDetectorProvider).getSilentMembers(activeCircle.members),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                    final silentMembers = snapshot.data!;
+                    final isFamily = activeCircle.type == 'Family';
+                    final currentUserId = userAsync.asData?.value?.uid;
+                    
+                    // Filter out the current user to handle them separately
+                    final othersSilent = silentMembers.where((m) => m['uid'] != currentUserId).toList();
+                    final amISilent = silentMembers.any((m) => m['uid'] == currentUserId);
+                    final mySilentData = amISilent ? silentMembers.firstWhere((m) => m['uid'] == currentUserId) : null;
+
+                    if (isFamily) {
+                      // ── FAMILY: Full Banner ──
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 24),
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: AppColors.watch.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: AppColors.watch.withValues(alpha: 0.5)),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(Icons.family_restroom_rounded, color: AppColors.watch, size: 28),
+                                const SizedBox(width: 12),
+                                Text('Family Silence Alert', style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 16)),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            if (amISilent) Padding(
+                              padding: const EdgeInsets.only(bottom: 6),
+                              child: Row(
+                                children: [
+                                  Container(width: 8, height: 8, decoration: const BoxDecoration(color: AppColors.watch, shape: BoxShape.circle)),
+                                  const SizedBox(width: 10),
+                                  Text('You — ${mySilentData!['daysSilent']} days silent',
+                                    style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 13)),
+                                ],
+                              ),
+                            ),
+                            ...othersSilent.map((m) => Padding(
+                              padding: const EdgeInsets.only(bottom: 6),
+                              child: Row(
+                                children: [
+                                  Container(width: 8, height: 8, decoration: const BoxDecoration(color: AppColors.watch, shape: BoxShape.circle)),
+                                  const SizedBox(width: 10),
+                                  Text('${m['name']} — ${m['daysSilent']} days silent',
+                                    style: TextStyle(color: subColor, fontSize: 13)),
+                                ],
+                              ),
+                            )),
+                            const SizedBox(height: 8),
+                            Text(amISilent 
+                              ? (othersSilent.isEmpty ? 'Your family is waiting to hear from you. Please check in.' : 'You and others haven\'t checked in. Please reach out to your family.')
+                              : 'Reach out to your family. They may need you.',
+                              style: TextStyle(color: AppColors.watch, fontSize: 12, fontStyle: FontStyle.italic)),
+                          ],
+                        ),
+                      );
+                    } else {
+                      // ── OTHER: Compact Bubble ──
+                      String title;
+                      if (amISilent && othersSilent.isEmpty) {
+                        title = 'You haven\'t checked in recently';
+                      } else if (amISilent && othersSilent.isNotEmpty) {
+                        title = 'You and others need to check in';
+                      } else {
+                        final names = othersSilent.map((m) => m['name']).join(', ');
+                        title = '$names may need support';
+                      }
+
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 16),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: AppColors.watch.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.notifications_active_rounded, color: AppColors.watch, size: 18),
+                            const SizedBox(width: 8),
+                            Flexible(
+                              child: Text(title,
+                                style: const TextStyle(color: AppColors.watch, fontWeight: FontWeight.w500, fontSize: 12),
+                                overflow: TextOverflow.ellipsis),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
+
+            // ── Resolve Mode ────────────────────────────────────────────────
+            if (trustScore < AppConstants.watchThreshold && activeCircle != null)
+              Builder(builder: (ctx) {
+                final isFamily = activeCircle.type == 'Family';
+
+                if (isFamily) {
+                  // ── FAMILY: Full Banner ──
+                  return GestureDetector(
+                    onTap: () => context.push('/resolve'),
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 24),
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppColors.risk.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: AppColors.risk.withValues(alpha: 0.5)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.healing_rounded, color: AppColors.risk, size: 32),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Resolve Mode Available', style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 16)),
+                                const SizedBox(height: 4),
+                                Text('Trust score dropped to ${trustScore.toStringAsFixed(0)}%. Tap to get AI guidance.',
+                                  style: const TextStyle(color: AppColors.risk, fontSize: 13)),
+                              ],
+                            ),
+                          ),
+                          const Icon(Icons.arrow_forward_ios_rounded, color: AppColors.risk, size: 16),
+                        ],
+                      ),
+                    ),
+                  );
+                } else {
+                  // ── OTHER: Compact Bubble ──
+                  return GestureDetector(
+                    onTap: () => context.push('/resolve'),
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: AppColors.risk.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.warning_amber_rounded, color: AppColors.risk, size: 18),
+                          const SizedBox(width: 8),
+                          Text('Trust dropping — Resolve Mode',
+                            style: const TextStyle(color: AppColors.risk, fontWeight: FontWeight.w500, fontSize: 12)),
+                          const SizedBox(width: 4),
+                          const Icon(Icons.arrow_forward_ios_rounded, color: AppColors.risk, size: 12),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+              }),
 
             // ── Trust Ring + Stats Row ─────────────────────────────────────
             Container(

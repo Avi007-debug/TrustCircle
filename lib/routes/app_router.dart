@@ -11,6 +11,8 @@ import '../features/circles/join_circle_screen.dart';
 import '../features/checkin/checkin_screen.dart';
 import '../features/gratitude/gratitude_screen.dart';
 import '../features/insights/insights_screen.dart';
+import '../features/resolve/resolve_screen.dart';
+import '../features/onboarding/onboarding_screen.dart';
 
 GoRouter createRouter(WidgetRef ref) {
   return GoRouter(
@@ -26,6 +28,8 @@ GoRouter createRouter(WidgetRef ref) {
       GoRoute(path: '/checkin',   builder: (_, __) => const CheckinScreen()),
       GoRoute(path: '/gratitude', builder: (_, __) => const GratitudeScreen()),
       GoRoute(path: '/insights',  builder: (_, __) => const InsightsScreen()),
+      GoRoute(path: '/resolve',   builder: (_, __) => const ResolveScreen()),
+      GoRoute(path: '/onboarding', builder: (_, __) => const OnboardingScreen()),
     ],
   );
 }
@@ -44,5 +48,7 @@ final GoRouter appRouter = GoRouter(
     GoRoute(path: '/checkin',   builder: (_, __) => const CheckinScreen()),
     GoRoute(path: '/gratitude', builder: (_, __) => const GratitudeScreen()),
     GoRoute(path: '/insights',  builder: (_, __) => const InsightsScreen()),
+    GoRoute(path: '/resolve',   builder: (_, __) => const ResolveScreen()),
+    GoRoute(path: '/onboarding', builder: (_, __) => const OnboardingScreen()),
   ],
 );

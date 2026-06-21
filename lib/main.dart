@@ -17,6 +17,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await notificationService.init();
+  await notificationService.scheduleHourlyPulseNudge();
   runApp(
     const ProviderScope(
       child: TrustCircleApp(),

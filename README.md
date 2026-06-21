@@ -17,10 +17,10 @@
 - [Team](#team)
 - [Tech Stack](#tech-stack)
 - [Current Status](#current-status)
+- [Implemented Features](#implemented-features)
 - [Project Structure](#project-structure)
 - [Getting Started](#getting-started)
 - [Development](#development)
-- [Roadmap](#roadmap)
 - [Contributing](#contributing)
 
 ---
@@ -29,14 +29,53 @@
 
 **TrustCircle** is an AI-powered mobile application designed to help users manage and strengthen their relationships through daily check-ins, trust scoring, and AI-driven insights. The app leverages advanced AI models and voice technology to provide meaningful relationship health metrics and personalized recommendations.
 
-### Key Features (Planned)
+### Key Features (Implemented)
 - 🔐 Secure authentication with Firebase
 - 💬 Daily pulse check-ins and gratitude tracking
-- 🤖 AI-powered insights using Gemini and Melange
-- 🎤 Voice check-in support via Agora
+- 🤖 AI-powered insights using Gemini and local Melange models
+- 🎤 Voice check-in support using Speech-to-Text
 - 📊 Trust score calculation and dashboard
 - 👥 Circle management (create & join groups)
-- 🔔 Smart notifications and reminders
+- 🔔 Smart local push notifications (WhatsApp-style)
+- 🤫 Silence detection for inactive users
+- 🤝 Resolve Mode with AI conflict resolution guides
+- 🚀 **New:** Beautiful 5-page first-time user onboarding walkthrough
+
+---
+
+## ✨ Feature Deep-Dive
+
+### 1. 🚨 Silence Detector (Proactive Support)
+- Automatically monitors user activity within circles.
+- Triggers a **Silence Alert** if a user hasn't checked in for 3+ days.
+- **Circle-Aware UI:** 
+  - **Family Circles:** Displays a large, urgent banner urging members to reach out.
+  - **Other Circles:** Displays a subtle, compact bubble notification.
+- **Smart Copy:** Identifies if the current user is the silent one and dynamically changes the copy to encourage them to check in (e.g., "You — 4 days silent. Your family is waiting to hear from you.").
+
+### 2. 🎤 AI Voice Check-In
+- Users can tap the microphone to simply speak their feelings.
+- The app uses Natural Language Processing to automatically interpret their emotions and set the "Heard/Respected/Safe/Connected" sliders for them.
+
+### 3. 🤝 Resolve Mode
+- Automatically triggers when a circle's overall Trust Score drops below **50%**.
+- Generates an **AI Conflict Resolution Guide** using the Gemini API, specifically tailored to the circle's current trust data.
+- Guides are formatted beautifully in Markdown, providing actionable advice to repair the relationship.
+
+### 4. 🔔 Smart Notification System
+- **Hourly Nudges:** Reminds users to submit their daily pulse starting at a configured time, repeating hourly. Auto-cancels the moment a pulse is submitted.
+- **Push Alerts:** Sends immediate system notifications for Silence Alerts and Resolve Mode triggers.
+
+---
+
+## 🤖 Melange AI Integration Plan
+
+As part of the hackathon's requirement for on-device AI functionality, TrustCircle is architected to seamlessly integrate with **Melange AI**. Currently, it uses a simulated on-device heuristic that runs entirely locally, but the app is fully prepped to swap in a real Melange model:
+
+1. **Native Kotlin Compatibility:** The Android app is built using `MainActivity.kt` (Kotlin), ensuring seamless compatibility with Melange's native Android SDKs.
+2. **Model Export:** A sentiment analysis model (like DistilBERT) fine-tuned on the Melange platform can be exported as a `.tflite` file.
+3. **Integration:** The exported model is placed in `assets/models/melange_sentiment.tflite` and inferred using the `tflite_flutter` package inside the existing `LocalAiService`.
+4. **Privacy First:** Because the Melange model runs 100% on-device, users can submit voice/text check-ins even in Airplane Mode. Emotional journal data never leaves the phone.
 
 ---
 
@@ -47,13 +86,9 @@
 
 **GitHub Organization:** [Avi007-debug](https://github.com/Avi007-debug)
 
-### Team Members & Responsibilities
-
-| Role | Name | Responsibilities |
-|------|------|------------------|
-| **Frontend Lead** | Avishkar | Flutter Architecture, Riverpod, GoRouter, UI/UX, Dashboard, Check-in & Gratitude Screens |
-| **Backend Developer** | TBD | Firebase, Firestore, Authentication, Security Rules, Cloud Functions, Notifications |
-| **AI Developer** | TBD | Gemini Integration, Melange, Agora Setup, Silence Detection, AI Insights Engine |
+### Contributor
+**Name:** Avishkar More
+**Role:** Sole Developer (Frontend, Backend, AI Integration, UI/UX Architecture)
 
 ---
 
@@ -68,25 +103,19 @@
 - **Fonts:** Google Fonts
 - **Assets:** Flutter SVG
 
-### Backend & Services (To Be Implemented)
+### Backend & Services
 - **Backend:** Firebase
 - **Database:** Firestore
 - **Authentication:** Firebase Auth
-- **Cloud Functions:** Firebase Functions
-- **Messaging:** Firebase Cloud Messaging
+- **Messaging:** Local Push Notifications (`flutter_local_notifications`)
 
-### AI & Voice (To Be Implemented)
+### AI & Voice
 - **AI Model:** Google Gemini API
-- **On-Device AI:** Gemini Nano
-- **Integration Framework:** Melange
-- **Voice Platform:** Agora (Real-time Communication)
-- **Audio Processing:** Silence Detection
+- **On-Device AI:** Melange fallback simulated heuristic (Ready for `.tflite` export)
+- **Audio Processing:** Speech-to-Text
 
 ### Development & Testing
 - **IDE:** Android Studio 2024.3
-- **Android SDK:** Fully configured
-- **Build Tools:** Latest
-- **NDK:** 30.0.14904198
 - **Test Device:** OPPO CPH2381 (Android 14, API 34)
 
 ---
@@ -97,35 +126,25 @@
 |---------|-------|
 | **Package Name** | com.zombieheart.trustcircle |
 | **App Name** | TrustCircle |
-| **Min SDK** | As per project requirements |
 | **Target SDK** | Latest available |
-| **Device Tested** | OPPO CPH2381 (Android 14) |
 
 ---
 
 ## ✅ Current Status
 
+**Status:** Hackathon Ready 🚀
+
 ### Completed ✨
 - [x] Flutter environment setup & verification
-- [x] Android SDK & toolchain configuration
-- [x] Physical device debugging setup
-- [x] Project build & deployment pipeline
 - [x] Package name configuration (`com.zombieheart.trustcircle`)
-- [x] GitHub repository creation & integration
-- [x] Core dependencies installation (Riverpod, GoRouter, Google Fonts, Flutter SVG)
-- [x] Project folder architecture
-- [x] Default Flutter counter app removed
-- [x] TrustCircle branding implementation
-
-### Version
-**Foundation Setup Complete** - Ready for Phase 1 implementation
-
-### Application Status
-✅ **Successfully builds and runs on physical device**
-- Displays "TrustCircle" on dark background
-- Package rename verified
-- Android configuration verified
-- Build pipeline operational
+- [x] Authentication and Firebase setup
+- [x] Circle creation and management logic
+- [x] Daily trust pulse check-ins with sliders
+- [x] **New:** Voice Check-In (transcribes speech to auto-set sliders)
+- [x] **New:** Silence Detector (banners when members are inactive)
+- [x] **New:** Resolve Mode (auto-triggers below 50% trust with Gemini advice)
+- [x] **New:** WhatsApp-style notifications (real-time high priority alerts)
+- [x] **New:** Melange On-Device architecture ready
 
 ---
 
@@ -145,13 +164,14 @@ lib/
 │   ├── splash/                 # Splash screen
 │   ├── auth/                   # Authentication
 │   ├── home/                   # Home dashboard
-│   ├── checkin/                # Check-in features
+│   ├── checkin/                # Check-in and Voice features
 │   ├── gratitude/              # Gratitude tracking
 │   ├── insights/               # AI insights
+│   ├── resolve/                # Resolve Mode screens
 │   └── profile/                # User profile
 ├── providers/                  # Riverpod providers
 ├── routes/                     # Navigation routing
-├── services/                   # Business logic services
+├── services/                   # Business logic (Gemini, Silence, Local AI)
 └── widgets/                    # Reusable widgets
 ```
 
@@ -163,8 +183,6 @@ lib/
 - **Flutter:** 3.29.2 (Stable)
 - **Dart:** 3.7.2
 - **Android Studio:** 2024.3 or later
-- **Android SDK:** API 30+
-- **Physical/Virtual Device** with Android 10+
 
 ### Installation
 
@@ -174,138 +192,15 @@ lib/
    cd TrustCircle
    ```
 
-2. **Verify Flutter setup**
-   ```bash
-   flutter doctor
-   ```
-
-3. **Install dependencies**
+2. **Install dependencies**
    ```bash
    flutter pub get
    ```
 
-4. **Run the app**
+3. **Run the app**
    ```bash
    flutter run
    ```
-
-5. **Build APK (optional)**
-   ```bash
-   flutter build apk --release
-   ```
-
----
-
-## 🔄 Development Workflow
-
-### Branch Strategy
-
-```
-main (Stable)
-  └── develop (Active Development)
-        ├── feature/auth
-        ├── feature/firebase
-        ├── feature/checkin
-        ├── feature/gratitude
-        ├── feature/voice-checkin
-        ├── feature/ai-insights
-        └── ... (more feature branches)
-```
-
-**Rules:**
-- ⛔ No direct commits to `main`
-- ✅ All development happens on `develop`
-- ✅ Feature branches created from `develop`
-- ✅ Pull requests required for merging
-
-### Current Installed Packages
-- `flutter_riverpod` - State management
-- `go_router` - Navigation
-- `google_fonts` - Typography
-- `flutter_svg` - SVG asset support
-
----
-
-## 📋 Roadmap
-
-### Phase 1: App Foundation 🏗️
-- [ ] Create `develop` branch
-- [ ] Setup `ProviderScope` (Riverpod root)
-- [ ] Implement app theme
-- [ ] Create splash screen
-- [ ] Setup GoRouter navigation
-- [ ] Define route constants
-
-### Phase 2: Authentication 🔐
-- [ ] Firebase project setup
-- [ ] FlutterFire CLI configuration
-- [ ] Firebase authentication
-- [ ] Login screen UI
-- [ ] Signup screen UI
-- [ ] Session management
-
-### Phase 3: Core Features 🎯
-- [ ] Circle creation & management
-- [ ] Join circle functionality
-- [ ] Daily pulse check-ins
-- [ ] Trust score calculation
-- [ ] Main dashboard
-
-### Phase 4: Advanced Features 🤖
-- [ ] Gratitude tracking system
-- [ ] AI insights engine (Gemini)
-- [ ] Voice check-in support (Agora)
-- [ ] Silence detection
-- [ ] Cloud functions
-
-### Phase 5: Refinement & Launch 🚀
-- [ ] User testing
-- [ ] Performance optimization
-- [ ] Security audit
-- [ ] App store preparation
-- [ ] Public release
-
----
-
-## ⚠️ Not Yet Implemented
-
-### Firebase Integration
-- Firebase project setup
-- Firestore database
-- Firebase authentication
-- Cloud functions
-- Firebase messaging
-
-### AI & Voice Features
-- Gemini API integration
-- Gemini Nano (on-device)
-- Melange framework
-- Agora voice setup
-- Silence detection
-
-### Core Business Logic
-- Trust score calculation algorithm
-- Pulse check-in system
-- Gratitude system backend
-- Insights engine
-- Notification system
-
----
-
-## 🔗 Important Links
-
-- **Repository:** https://github.com/Avi007-debug/TrustCircle
-- **Flutter Docs:** https://flutter.dev/docs
-- **Dart Docs:** https://dart.dev/guides
-- **Firebase Docs:** https://firebase.google.com/docs
-- **Riverpod Docs:** https://riverpod.dev
-- **GoRouter Docs:** https://pub.dev/packages/go_router
-
----
-
-## 📖 Documentation
-
-For detailed documentation on specific features or modules, refer to the relevant feature folder's README (to be created as implementation progresses).
 
 ---
 
@@ -318,11 +213,6 @@ For detailed documentation on specific features or modules, refer to the relevan
 4. Push to your branch: `git push origin feature/your-feature-name`
 5. Create a Pull Request to `develop` branch
 
-### Code Style
-- Follow [Dart style guide](https://dart.dev/guides/language/effective-dart/style)
-- Format code: `dart format lib/`
-- Analyze: `dart analyze`
-
 ---
 
 ## 📜 License
@@ -331,24 +221,13 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-## 👨‍💻 Authors
+## 👨‍💻 Contributor
 
-**Zombie Heart Team**
+**Zombie Heart**
 
-- Lead: Avishkar (Frontend)
-- To be added: Backend Developer
-- To be added: AI Developer
+- Avishkar More (Sole Developer)
 
 ---
 
-## 📞 Contact & Support
-
-For questions or support, please:
-1. Check existing GitHub issues
-2. Create a new GitHub issue with detailed description
-3. Contact the team lead
-
----
-
-**Last Updated:** June 14, 2026  
-**Status:** Foundation Setup Complete ✅
+**Last Updated:** June 20, 2026  
+**Status:** Hackathon Build Complete ✅

@@ -103,10 +103,11 @@ class FirestoreService {
     return UserModel.fromMap(snap.data()!);
   }
 
-  Future<DateTime?> getLastActivityDate(String uid) async {
+  Future<DateTime?> getLastActivityDate(String uid, {required String circleId}) async {
     final snap = await _db
         .collection(AppConstants.pulsesCollection)
         .where('userId', isEqualTo: uid)
+        .where('circleId', isEqualTo: circleId)
         .get();
     
     if (snap.docs.isEmpty) return null;

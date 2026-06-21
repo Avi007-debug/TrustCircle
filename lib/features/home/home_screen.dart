@@ -230,7 +230,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             // ── Silence Detector ────────────────────────────────────────────
             if (activeCircle != null)
               FutureBuilder<List<Map<String, dynamic>>>(
-                future: ref.read(silenceDetectorProvider).getSilentMembers(activeCircle.members),
+                future: ref.read(silenceDetectorProvider).getSilentMembers(activeCircle.id, activeCircle.members),
                 builder: (context, snapshot) {
                   if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                     final silentMembers = snapshot.data!;

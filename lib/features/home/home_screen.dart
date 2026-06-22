@@ -1298,9 +1298,12 @@ class _CircleCard extends ConsumerWidget {
                             children: [
                               Icon(Icons.people_alt_rounded, color: primary, size: 12),
                               const SizedBox(width: 4),
-                              Text(
-                                '${circle.members.length} Members',
-                                style: TextStyle(color: primary, fontSize: 11, fontWeight: FontWeight.bold),
+                              Flexible(
+                                child: Text(
+                                  '${circle.members.length} Members',
+                                  style: TextStyle(color: primary, fontSize: 11, fontWeight: FontWeight.bold),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
                             ],
                           ),
@@ -1327,12 +1330,15 @@ class _CircleCard extends ConsumerWidget {
                               children: [
                                 Icon(Icons.share_rounded, color: primary, size: 12),
                                 const SizedBox(width: 4),
-                                Text(
-                                  'Code: ${circle.inviteCode}',
-                                  style: TextStyle(
-                                    color: primary,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.bold,
+                                Flexible(
+                                  child: Text(
+                                    'Code: ${circle.inviteCode}',
+                                    style: TextStyle(
+                                      color: primary,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                               ],

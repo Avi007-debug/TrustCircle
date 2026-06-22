@@ -304,7 +304,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               children: [
                                 const Icon(Icons.family_restroom_rounded, color: AppColors.watch, size: 28),
                                 const SizedBox(width: 12),
-                                Text('Family Silence Alert', style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 16)),
+                                Flexible(
+                                  child: Text('Family Silence Alert', style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 16), overflow: TextOverflow.ellipsis),
+                                ),
                               ],
                             ),
                             const SizedBox(height: 10),
@@ -314,8 +316,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 children: [
                                   Container(width: 8, height: 8, decoration: const BoxDecoration(color: AppColors.watch, shape: BoxShape.circle)),
                                   const SizedBox(width: 10),
-                                  Text(amISilent ? 'You — ${mySilentData!['daysSilent']} days silent' : '${othersSilent.first['name']} — ${othersSilent.first['daysSilent']} days silent',
-                                    style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 13)),
+                                  Flexible(
+                                    child: Text(amISilent ? 'You — ${mySilentData!['daysSilent']} days silent' : '${othersSilent.first['name']} — ${othersSilent.first['daysSilent']} days silent',
+                                      style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 13),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -1292,9 +1298,12 @@ class _CircleCard extends ConsumerWidget {
                             children: [
                               Icon(Icons.people_alt_rounded, color: primary, size: 12),
                               const SizedBox(width: 4),
-                              Text(
-                                '${circle.members.length} Members',
-                                style: TextStyle(color: primary, fontSize: 11, fontWeight: FontWeight.bold),
+                              Flexible(
+                                child: Text(
+                                  '${circle.members.length} Members',
+                                  style: TextStyle(color: primary, fontSize: 11, fontWeight: FontWeight.bold),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
                             ],
                           ),
@@ -1321,12 +1330,15 @@ class _CircleCard extends ConsumerWidget {
                               children: [
                                 Icon(Icons.share_rounded, color: primary, size: 12),
                                 const SizedBox(width: 4),
-                                Text(
-                                  'Code: ${circle.inviteCode}',
-                                  style: TextStyle(
-                                    color: primary,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.bold,
+                                Flexible(
+                                  child: Text(
+                                    'Code: ${circle.inviteCode}',
+                                    style: TextStyle(
+                                      color: primary,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                               ],

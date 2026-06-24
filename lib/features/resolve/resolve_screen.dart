@@ -41,14 +41,8 @@ class _ResolveScreenState extends ConsumerState<ResolveScreen>
       final circle = ref.read(activeCircleProvider);
       final circleId = circle?.id ?? 'unknown';
 
-      // Get current trust score from pulses
-      double trustScore = 45.0;
-      final pulsesAsync = ref.read(circlePulsesProvider);
-      pulsesAsync.whenData((pulses) {
-        if (pulses.isNotEmpty) {
-          trustScore = pulses.map((p) => p.trustScore).reduce((a, b) => a + b) / pulses.length;
-        }
-      });
+      // Get current trust score
+      final trustScore = ref.read(circleTrustScoreProvider);
 
       final guide = await ref.read(geminiServiceProvider).generateResolveGuide(
         circleId,

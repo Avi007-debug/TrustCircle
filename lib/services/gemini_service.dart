@@ -155,7 +155,7 @@ Respond ONLY with valid JSON matching exactly this structure (no extra text, no 
 
   Future<String> generateResolveGuide(String circleId, double trustScore, List<dynamic> pulseData) async {
     final prompt = '''
-    The trust score in this circle has dropped to \$trustScore%. 
+    The trust score in this circle has dropped to ${trustScore.toStringAsFixed(0)}%. 
     Based on recent pulse data, generate a conflict resolution guide.
     Include 3 sections:
     1. Conflict Resolution Steps (numbered action items)

@@ -19,9 +19,9 @@
 
 ## 🎥 Demo Video
 
-[![TrustCircle Demo Video](https://img.shields.io/badge/YouTube-Watch_Demo-red?logo=youtube&style=for-the-badge)](https://www.youtube.com/watch?v=placeholder)
+Watch the complete feature walkthrough and see TrustCircle in action!
 
-<sub>*Replace link with actual video once uploaded*</sub>
+[![TrustCircle App Demo](https://img.youtube.com/vi/cwLbEZ66fbM/hqdefault.jpg)](https://youtu.be/cwLbEZ66fbM "TrustCircle App Demo - Click to Watch!")
 
 ---
 

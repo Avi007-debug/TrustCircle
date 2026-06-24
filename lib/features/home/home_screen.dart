@@ -192,7 +192,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     // Auto-fire resolve notification when trust score is low
     if (!circlePulsesAsync.isLoading && circlePulsesAsync.hasValue && circlePulsesAsync.value!.isNotEmpty) {
-      if (trustScore < AppConstants.watchThreshold && activeCircle != null) {
+      if ((trustScore < AppConstants.watchThreshold || myTrustScore < AppConstants.watchThreshold) && activeCircle != null) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           notificationService.showResolveNotification(activeCircle.name, trustScore);
         });
@@ -407,7 +407,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
 
             // ── Resolve Mode ────────────────────────────────────────────────
-            if (trustScore < AppConstants.watchThreshold && activeCircle != null)
+            if ((trustScore < AppConstants.watchThreshold || myTrustScore < AppConstants.watchThreshold) && activeCircle != null)
               Builder(builder: (ctx) {
                 final isFamily = activeCircle.type == 'Family';
 
